@@ -191,6 +191,14 @@
     text-transform: uppercase;
     letter-spacing: 1px;
   }
+  .thanks {
+    font-family: "Oswald", sans-serif;
+    color: var(--pink);
+    font-size: clamp(17px, 5vw, 24px);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 12px 0;
+  }
 </style>
 </head>
 <body>
@@ -220,11 +228,39 @@
     <p class="or">or</p>
     <h2>Sign Up For The<br>Gay<span class="pink">Invest</span>.com <span class="pink">NSFW</span>letter!</h2>
     <p class="wink">(I promise to keep it professional and SFW)</p>
-    <form>
-      <input type="email" placeholder="your@email.com" required>
+    <form id="signup-form" action="https://formspree.io/f/xkjgwden" method="POST">
+      <input type="email" name="email" placeholder="your@email.com" required>
       <button class="btn" type="submit">Sign Me Up</button>
     </form>
+    <div id="signup-thanks" class="thanks" hidden>Thank you for signing up!</div>
   </section>
 
+<script>
+  const form = document.getElementById('signup-form');
+  const thanks = document.getElementById('signup-thanks');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'Signing Up...';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        thanks.hidden = false;
+      } else {
+        throw new Error('submit failed');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Sign Me Up';
+      alert('Something went wrong — please try again.');
+    }
+  });
+</script>
 </body>
 </html>
