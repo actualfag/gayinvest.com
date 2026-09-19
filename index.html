@@ -31,6 +31,12 @@
     padding: 40px 10px 28px;
     overflow: hidden;
   }
+  .wordmark-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp(90px, 28vw, 150px);
+  }
   .wordmark {
     font-family: "Bebas Neue", "Arial Narrow", sans-serif;
     font-size: clamp(42px, 13.2vw, 64px);
@@ -206,7 +212,7 @@
 <body>
 
   <section class="hero">
-    <div class="wordmark">GAY<span class="invest">INVEST</span>.COM</div>
+    <div class="wordmark-box"><div class="wordmark">GAY<span class="invest">INVEST</span>.COM</div></div>
     <div class="rule"></div>
     <div class="tagline">Keeping Your Business In The Family.</div>
   </section>
@@ -240,13 +246,20 @@
 <script>
   function fitWordmark() {
     const hero = document.querySelector('.hero');
+    const box = document.querySelector('.wordmark-box');
     const el = document.querySelector('.wordmark');
     const buffer = 20; // 10px each side
+    el.style.transform = 'none';
     el.style.fontSize = '100px';
     const naturalWidth = el.scrollWidth;
     const available = hero.clientWidth - buffer;
     const newSize = (available / naturalWidth) * 100;
     el.style.fontSize = newSize + 'px';
+
+    const naturalHeight = el.getBoundingClientRect().height;
+    const availableHeight = box.clientHeight - buffer;
+    const scaleY = availableHeight / naturalHeight;
+    el.style.transform = `scaleY(${scaleY})`;
   }
   fitWordmark();
   window.addEventListener('resize', fitWordmark);
