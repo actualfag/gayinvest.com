@@ -6,7 +6,7 @@
 <title>GayInvest.com</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;700&family=Courier+Prime:wght@400;700&family=Inter:wght@500;700&family=Caveat:wght@600&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;700&family=Courier+Prime:wght@400;700&family=Inter:wght@500;700&family=Caveat:wght@600&family=Permanent+Marker&family=IBM+Plex+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a;
@@ -22,6 +22,76 @@
     max-width: 480px;
     margin: 0 auto;
     overflow-x: hidden;
+    padding-top: var(--ticker-height);
+  }
+
+  /* Market ticker */
+  :root {
+    --ticker-height: 30px;
+    --ticker-duration: 110s;
+  }
+  .ticker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--ticker-height);
+    background: var(--pink);
+    border-bottom: 1px solid #262626;
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+  }
+  .ticker-track {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: ticker-scroll var(--ticker-duration) linear infinite;
+    will-change: transform;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+      animation: none;
+    }
+  }
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--white);
+    padding: 0 14px;
+  }
+  .ticker-label.emphasis {
+    color: var(--pink);
+  }
+  .ticker-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+  }
+  .ticker-arrow.up {
+    border-bottom: 9px solid var(--black);
+  }
+  .ticker-arrow.down {
+    border-top: 9px solid var(--black);
+  }
+  .ticker-value {
+    color: var(--black);
   }
 
   /* Hero / wordmark */
@@ -226,6 +296,10 @@
 </head>
 <body>
 
+  <div class="ticker" id="ticker">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
   <section class="hero">
     <div class="wordmark-box"><div class="wordmark">GAY<span class="invest">INVEST</span>.COM</div></div>
     <div class="tagline">Keeping Your Business <span class="pink">In The Family</span></div>
@@ -258,6 +332,52 @@
   </section>
 
 <script>
+  /* ---- Market ticker ----
+     Edit TICKER_ITEMS below to add/remove/reorder entries.
+     Each entry: { label, direction: "up"|"down"|null, value?: string, emphasis?: boolean }
+  */
+  const TICKER_ITEMS = [
+    { label: "Owners 55+", direction: "up", value: "51%" },
+    { label: "Business Daddies", direction: "up" },
+    { label: "LGBTQ+", direction: "up", value: "9%" },
+    { label: "Retirement Pressure", direction: "up" },
+    { label: "Straight Nephews", direction: "down" },
+    { label: "LGBTQ+ Business Impact", direction: "up", value: "$1.7T" },
+    { label: "Mentorship", direction: "up" },
+    { label: "Under 30 LGBTQ+", direction: "up", value: "23%" },
+    { label: "Private Equity", direction: "down" },
+    { label: "Successor Potential", direction: "up" },
+    { label: "Silver Tsunami", direction: "up", value: "$124T" },
+    { label: "Mutual Deals", direction: "up" },
+    { label: "Queer Wealth", direction: "down" },
+    { label: "Owners 55+", direction: "up", value: "51%" },
+    { label: "Legacy", direction: "up" },
+    { label: "LGBTQ+", direction: "up", value: "9%" },
+    { label: "Business Daddies", direction: "up" },
+    { label: "LGBTQ+ Business Impact", direction: "up", value: "$1.7T" },
+    { label: "Succession", direction: "up" },
+    { label: "Under 30 LGBTQ+", direction: "up", value: "23%" },
+    { label: "Straight Nephews", direction: "down" },
+    { label: "Silver Tsunami", direction: "up", value: "$124T" },
+    { label: "GayInvest", direction: "up", emphasis: true }
+  ];
+
+  function renderTickerItems(items) {
+    return items.map(function (item) {
+      var labelClass = "ticker-label" + (item.emphasis ? " emphasis" : "");
+      var arrowHtml = item.direction ? "<span class=\"ticker-arrow " + item.direction + "\" aria-label=\"" + item.direction + "\"></span>" : "";
+      var valueHtml = item.value ? "<span class=\"ticker-value\">" + item.value + "</span>" : "";
+      return "<span class=\"ticker-item\"><span class=\"" + labelClass + "\">" + item.label + "</span>" + arrowHtml + valueHtml + "</span>";
+    }).join("");
+  }
+
+  function initTicker() {
+    var track = document.getElementById("tickerTrack");
+    var html = renderTickerItems(TICKER_ITEMS);
+    track.innerHTML = html + html; // duplicated for seamless loop
+  }
+  initTicker();
+
   function fitLineToWidth(container, el, extraScaleY) {
     el.style.transform = 'none';
     const available = container.clientWidth - 20; // 10px buffer each side
