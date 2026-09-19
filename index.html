@@ -28,7 +28,8 @@
   .hero {
     background: var(--black);
     text-align: center;
-    padding: 40px 8px 28px;
+    padding: 40px 10px 28px;
+    overflow: hidden;
   }
   .wordmark {
     font-family: "Bebas Neue", "Arial Narrow", sans-serif;
@@ -39,6 +40,7 @@
     text-transform: uppercase;
     white-space: nowrap;
     color: var(--white);
+    display: inline-block;
   }
   .wordmark .invest { color: var(--pink); }
   .rule {
@@ -236,6 +238,22 @@
   </section>
 
 <script>
+  function fitWordmark() {
+    const hero = document.querySelector('.hero');
+    const el = document.querySelector('.wordmark');
+    const buffer = 20; // 10px each side
+    el.style.fontSize = '100px';
+    const naturalWidth = el.scrollWidth;
+    const available = hero.clientWidth - buffer;
+    const newSize = (available / naturalWidth) * 100;
+    el.style.fontSize = newSize + 'px';
+  }
+  fitWordmark();
+  window.addEventListener('resize', fitWordmark);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fitWordmark);
+  }
+
   const form = document.getElementById('signup-form');
   const thanks = document.getElementById('signup-thanks');
   form.addEventListener('submit', async (e) => {
