@@ -28,7 +28,7 @@
   .hero {
     background: var(--black);
     text-align: center;
-    padding: 28px 10px 20px;
+    padding: 28px 10px 12.5px;
   }
   .wordmark-box {
     display: flex;
@@ -54,7 +54,7 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     font-weight: 300;
-    margin-top: -5px;
+    margin-top: -0.5px;
     white-space: nowrap;
     display: inline-block;
   }
@@ -62,9 +62,11 @@
 
   /* Contact bar */
   .contact-bar {
-    background: var(--pink);
-    color: var(--black);
-    padding: 14px 20px;
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--pink);
+    margin: 0 10px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,12 +77,12 @@
     font-family: "Permanent Marker", cursive;
     font-weight: 400;
     text-transform: uppercase;
-    font-size: clamp(19px, 6vw, 29px);
+    font-size: clamp(15px, 4.8vw, 23px);
     letter-spacing: 0.5px;
   }
   .bar-link {
-    color: var(--black);
-    text-decoration: underline;
+    color: var(--pink);
+    text-decoration: none;
   }
   .btn {
     display: inline-flex;
@@ -142,12 +144,12 @@
   }
   .email-now {
     font-family: "Permanent Marker", cursive;
-    font-size: clamp(21px, 6.5vw, 31px);
+    font-size: clamp(17px, 5.2vw, 25px);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
   }
-  .email-now .inline-link { color: var(--pink); text-decoration: underline; }
+  .email-now .inline-link { color: var(--pink); text-decoration: none; }
   .signup h2 {
     font-family: "Oswald", sans-serif;
     font-size: clamp(17px, 5vw, 24px);
