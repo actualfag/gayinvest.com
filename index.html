@@ -64,7 +64,6 @@
   .ticker-item {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
     font-family: "IBM Plex Mono", "Courier New", monospace;
     font-weight: 300;
     font-size: 12px;
@@ -74,12 +73,13 @@
     padding: 0 14px;
   }
   .ticker-label.emphasis {
-    color: var(--pink);
+    color: var(--black);
   }
   .ticker-arrow {
     display: inline-block;
     width: 0;
     height: 0;
+    margin-left: 7px;
     border-left: 0.52em solid transparent;
     border-right: 0.52em solid transparent;
   }
@@ -91,6 +91,106 @@
   }
   .ticker-value {
     color: var(--black);
+    margin-left: 7px;
+  }
+  .ticker-value.tight {
+    margin-left: 0;
+  }
+  .ticker-item {
+    cursor: pointer;
+  }
+
+  /* Ticker citation drawer */
+  .ticker-drawer-backdrop {
+    position: fixed;
+    top: var(--ticker-height);
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .ticker-drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ticker-drawer {
+    position: fixed;
+    top: var(--ticker-height);
+    left: 0;
+    width: 100%;
+    max-height: 75vh;
+    overflow-y: auto;
+    background: var(--black);
+    border-bottom: 2px solid var(--pink);
+    z-index: 999;
+    box-sizing: border-box;
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .ticker-drawer.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ticker-drawer-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .drawer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--pink);
+    color: var(--pink);
+    font-family: "Courier Prime", monospace;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 0;
+  }
+  .drawer-content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .drawer-data {
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .drawer-data strong {
+    color: var(--pink);
+  }
+  .drawer-sources {
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: 11px;
+    color: #999;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .drawer-sources a {
+    color: var(--pink);
+    text-decoration: underline;
+  }
+  .ticker-item.active {
+    border-bottom: 2px solid var(--black);
   }
 
   /* Hero / wordmark */
@@ -299,6 +399,18 @@
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
 
+  <div class="ticker-drawer-backdrop" id="tickerBackdrop"></div>
+  <div class="ticker-drawer" id="tickerDrawer">
+    <div class="ticker-drawer-inner">
+      <button class="drawer-nav prev" id="drawerPrev" aria-label="Previous statement">&#8249;</button>
+      <div class="drawer-content">
+        <div class="drawer-data" id="drawerData"></div>
+        <div class="drawer-sources" id="drawerSources"></div>
+      </div>
+      <button class="drawer-nav next" id="drawerNext" aria-label="Next statement">&#8250;</button>
+    </div>
+  </div>
+
   <section class="hero">
     <div class="wordmark-box"><div class="wordmark">GAY<span class="invest">INVEST</span>.COM</div></div>
     <div class="tagline">Keeping Your Business <span class="pink">In The Family</span></div>
@@ -336,37 +448,119 @@
      Each entry: { label, direction: "up"|"down"|null, value?: string, emphasis?: boolean }
   */
   const TICKER_ITEMS = [
-    { label: "Owners 55+", direction: "up", value: "51%" },
-    { label: "Business Daddies", direction: "up" },
-    { label: "LGBTQ+", direction: "up", value: "9%" },
-    { label: "Retirement Pressure", direction: "up" },
-    { label: "Straight Nephews", direction: "down" },
-    { label: "LGBTQ+ Business Impact", direction: "up", value: "$1.7T" },
-    { label: "Mentorship", direction: "up" },
-    { label: "Under 30 LGBTQ+", direction: "up", value: "23%" },
-    { label: "Private Equity", direction: "down" },
-    { label: "Successor Potential", direction: "up" },
-    { label: "Silver Tsunami", direction: "up", value: "$124T" },
-    { label: "Mutual Deals", direction: "up" },
-    { label: "Queer Wealth", direction: "down" },
-    { label: "Owners 55+", direction: "up", value: "51%" },
-    { label: "Legacy", direction: "up" },
-    { label: "LGBTQ+", direction: "up", value: "9%" },
-    { label: "Business Daddies", direction: "up" },
-    { label: "LGBTQ+ Business Impact", direction: "up", value: "$1.7T" },
-    { label: "Succession", direction: "up" },
-    { label: "Under 30 LGBTQ+", direction: "up", value: "23%" },
-    { label: "Straight Nephews", direction: "down" },
-    { label: "Silver Tsunami", direction: "up", value: "$124T" },
-    { label: "GayInvest", direction: "up", emphasis: true }
+    { label: "55+ Owned Biz", direction: "up", value: "$6.5T Rev", citation: {
+      data: `Approximately 2.9 million privately held U.S. businesses with employees and owners over 55 collectively generate an estimated <strong>$6.5T in annual revenue</strong>. This is revenue&mdash;not enterprise value, sale value or revenue immediately at risk.`,
+      sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
+      status: "Data-backed estimate"
+    } },
+    { label: "Biz Owners 55+", direction: "up", value: "2.9M", citation: {
+      data: `Approximately <strong>2.9 million privately held U.S. businesses with employees have owners over 55</strong>. &ldquo;Owners&rdquo; is compact ticker shorthand: the figure counts businesses, not 2.9 million individual owners. A business may have multiple owners.`,
+      sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
+      status: "Data-backed estimate with shorthand"
+    } },
+    { label: "Closure/No Plan", direction: "up", value: "55%", citation: {
+      data: `Gallup found that <strong>22%</strong> of owners planned to close and <strong>33%</strong> had no long-term plan or were unsure. Together, these categories equal <strong>55%</strong>.`,
+      sources: [{ text: "Gallup — Most Small-Business Owners Lack a Succession Plan", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Calculated from survey results"
+    } },
+    { parts: [
+      { label: "Biz Daddy", direction: "down" },
+      { label: "4 Biz Boy", direction: "up" }
+    ] },
+    { label: "Retirement Pressure", direction: "up", citation: {
+      data: `GayInvest shorthand for the succession pressure created by an aging business-owner population. Approximately <strong>2.9 million employer businesses have owners over 55</strong>. Among owners 55 and older, <strong>17% planned to sell or transfer their business within five years</strong>, while <strong>13% planned to close it</strong>. These figures establish approaching ownership transitions, although no study calculates a national &ldquo;retirement pressure&rdquo; index.`,
+      sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }, { text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Editorial synthesis of owner-age and succession-intention data"
+    } },
+    { label: "Silver Tsunami", direction: "down", value: "2.9M Biz", citation: {
+      data: `Refers to the approaching ownership transition involving approximately <strong>2.9 million employer businesses with owners over 55</strong>. The down arrow signals concern about disruption, closure and lost continuity&mdash;not a decline of 2.9 million businesses.`,
+      sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
+      status: "Data-backed figure with editorial framing"
+    } },
+    { label: "LGBTQ+ Pop 50+", direction: "up", value: "3%", citation: {
+      data: `Gallup found that LGBTQ+ identification was <strong>3% or less among adults aged 50 and older</strong>, depending on the specific age group. The ticker simplifies this to 3%.`,
+      sources: [{ text: "Gallup — LGBTQ+ Identification Holds at 9%", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
+      status: "Data-backed with simplified wording"
+    } },
+    { label: "Vers", direction: "up", value: "4 Side" },
+    { label: "Closure Plan", direction: "down", value: "22%", citation: {
+      data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business. The down arrow identifies closure as undesirable; it does not indicate a 22% decline.`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Survey result with editorial arrow"
+    } },
+    { label: "LGBTQ+ Owned Biz", direction: "up", value: "6%", citation: {
+      data: `Approximately <strong>6% of small employer businesses are at least partially owned by someone identifying as LGBTQ+</strong>. &ldquo;At least partially owned&rdquo; does not necessarily mean majority LGBTQ+ ownership.`,
+      sources: [{ text: "Federal Reserve Banks — LGBTQ-Owned Firms", url: "https://www.fedsmallbusiness.org/categories/lgbtq-owned-firms" }],
+      status: "Survey estimate"
+    } },
+    { label: "LGBTQ+ Pop 18+", direction: "up", value: "9%", citation: {
+      data: `Gallup estimates that <strong>9% of U.S. adults identified as LGBTQ+ in 2025</strong>, more than double its 3.5% measurement in 2012.`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
+      status: "National polling estimate"
+    } },
+    { label: "Biz Lezzies", direction: "up", value: "69 PTS" },
+    { label: "Queer Financial Security", direction: "down", value: "12 PTS", citation: {
+      data: `In 2021, <strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, compared with <strong>79% of non-LGBTQ+ adults</strong>&mdash;a <strong>12-percentage-point gap</strong>. This is a disparity between groups, not a 12-point decline over time.`,
+      sources: [{ text: "Federal Reserve — Economic Well-Being of U.S. Households in 2021", url: "https://www.federalreserve.gov/publications/2022-economic-well-being-of-us-households-in-2021-overall-financial-well-being-in-2021.htm" }],
+      status: "Calculated comparison"
+    } },
+    { label: "Queer Poverty Gap", direction: "up", value: "5 PTS", citation: {
+      data: `In 2021, <strong>17% of LGBT adults</strong> lived in poverty, compared with <strong>12% of non-LGBT adults</strong>&mdash;a <strong>5-percentage-point disparity</strong>. It does not mean the LGBT poverty rate increased by five points over time.`,
+      sources: [{ text: "Williams Institute — LGBT Poverty in the United States", url: "https://williamsinstitute.law.ucla.edu/publications/lgbt-poverty-us/" }],
+      status: "Calculated comparison"
+    } },
+    { label: "Queer Biz Impact", direction: "up", value: "$1.7T+", citation: {
+      data: `NGLCC estimates that LGBT-owned businesses represented in its research contribute <strong>more than $1.7T in economic impact</strong> to the U.S. economy. This is not queer household wealth, annual revenue or enterprise value.`,
+      sources: [{ text: "NGLCC — America's LGBT Economy", url: "https://nglcc.org/wp-content/uploads/2022/02/REPORT-NGLCC-Americas-LGBT-Economy-1-1.pdf" }],
+      status: "Industry-organization estimate"
+    } },
+    { label: "Str8 Heirs", direction: "down", value: "666 PTS", citation: {
+      data: `GayInvest's rejection of treating heterosexual family inheritance as the automatic succession route. The <strong>666-point movement is fictional</strong>. Gallup found that 26% of owners plan to give their business to a family member or someone else, but the survey does not identify heirs by sexual orientation or separate family from other recipients in the published figure.`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Editorial joke with related context"
+    } },
+    { label: "Biz Sale Plans", direction: "up", value: "23%", citation: {
+      data: `<strong>23% of surveyed business owners</strong> said their long-term plan was to sell the business. This measures owners' intentions&mdash;not completed or successful business sales.`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Survey result"
+    } },
+    { label: "BB", direction: "up", value: "2026%" },
+    { label: "Successor Potential", direction: "up", value: "23%", citation: {
+      data: `The <strong>23%</strong> represents the share of adults under 30 who identified as LGBTQ+ in 2025. GayInvest interprets this larger younger queer population as potential successors, but Gallup did not measure business-acquisition interest, readiness or access to capital.`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
+      status: "Editorial inference using real data"
+    } },
+    { label: "Legacy At Risk", direction: "down", value: "55%", citation: {
+      data: `The figure combines the <strong>22% planning closure</strong> and <strong>33% with no plan or unsure</strong>. GayInvest interprets those circumstances as threatening business continuity, employment, community relationships and owner legacy. Gallup did not directly measure &ldquo;legacy at risk.&rdquo;`,
+      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      status: "Editorial interpretation of survey data"
+    } },
+    { label: "Private Equity", direction: "down", citation: {
+      data: `Expresses GayInvest's preference for personal, community and relationship-based succession over institutional acquisition. Research finds that PE outcomes vary substantially by transaction type, so the ticker does not attach a universal negative percentage.`,
+      sources: [{ text: "NBER — Economic Effects of Private Equity Buyouts", url: "https://www.nber.org/system/files/working_papers/w26371/revisions/w26371.rev0.pdf" }],
+      status: "Editorial position"
+    } },
+    { label: "GayInvest", direction: "up", emphasis: true, citation: {
+      data: `Optimistic brand sign-off representing GayInvest's mission and proposed succession model.`,
+      sources: [{ text: "GayInvest editorial language", url: null }],
+      status: "Brand statement"
+    } }
   ];
 
+  function renderStatementInner(part) {
+    var labelClass = "ticker-label" + (part.emphasis ? " emphasis" : "");
+    var arrowHtml = part.direction ? "<span class=\"ticker-arrow " + part.direction + "\" aria-label=\"" + part.direction + "\"></span>" : "";
+    var valueClass = "ticker-value" + (part.tight ? " tight" : "");
+    var valueHtml = part.value ? "<span class=\"" + valueClass + "\">" + part.value + "</span>" : "";
+    return "<span class=\"" + labelClass + "\">" + part.label + "</span>" + arrowHtml + valueHtml;
+  }
+
   function renderTickerItems(items) {
-    return items.map(function (item) {
-      var labelClass = "ticker-label" + (item.emphasis ? " emphasis" : "");
-      var arrowHtml = item.direction ? "<span class=\"ticker-arrow " + item.direction + "\" aria-label=\"" + item.direction + "\"></span>" : "";
-      var valueHtml = item.value ? "<span class=\"ticker-value\">" + item.value + "</span>" : "";
-      return "<span class=\"ticker-item\"><span class=\"" + labelClass + "\">" + item.label + "</span>" + arrowHtml + valueHtml + "</span>";
+    return items.map(function (item, i) {
+      var inner = item.parts
+        ? item.parts.map(renderStatementInner).join("<span style=\"margin-left:7px\"></span>")
+        : renderStatementInner(item);
+      return "<span class=\"ticker-item\" data-index=\"" + i + "\">" + inner + "</span>";
     }).join("");
   }
 
@@ -376,6 +570,145 @@
     track.innerHTML = html + html; // duplicated for seamless loop
   }
   initTicker();
+
+  /* ---- Ticker citation drawer ---- */
+  var drawerIndex = 0;
+  var drawerIsOpen = false;
+
+  function setActiveTickerItem(index) {
+    var prev = document.querySelectorAll(".ticker-item.active");
+    for (var i = 0; i < prev.length; i++) prev[i].classList.remove("active");
+    var current = document.querySelectorAll('.ticker-item[data-index="' + index + '"]');
+    for (var j = 0; j < current.length; j++) current[j].classList.add("active");
+  }
+
+  function centerTrackOnIndex(index) {
+    var ticker = document.getElementById("ticker");
+    var track = document.getElementById("tickerTrack");
+    var target = track.children[index];
+    if (!target) return;
+    var offset = target.offsetLeft + target.offsetWidth / 2 - ticker.clientWidth / 2;
+    track.style.animation = "none";
+    track.style.transition = "transform 0.4s ease";
+    track.style.transform = "translateX(-" + offset + "px)";
+  }
+
+  function renderDrawerContent(index) {
+    var item = TICKER_ITEMS[index];
+    var c = item.citation;
+    var dataEl = document.getElementById("drawerData");
+    var sourcesEl = document.getElementById("drawerSources");
+    if (c) {
+      dataEl.innerHTML = c.data;
+      sourcesEl.innerHTML = "Source: " + c.sources.map(function (s) {
+        return s.url ? "<a href=\"" + s.url + "\" target=\"_blank\" rel=\"noopener\">" + s.text + "</a>" : s.text;
+      }).join("; ");
+      sourcesEl.style.display = "";
+    } else {
+      dataEl.textContent = "This one's just for fun — no data behind it.";
+      sourcesEl.innerHTML = "";
+      sourcesEl.style.display = "none";
+    }
+  }
+
+  // First tap/click on a ticker item: freeze the marquee exactly where it is,
+  // underline the item in place, open the drawer. Nothing moves.
+  function openInitial(index) {
+    drawerIndex = ((index % TICKER_ITEMS.length) + TICKER_ITEMS.length) % TICKER_ITEMS.length;
+    renderDrawerContent(drawerIndex);
+    setActiveTickerItem(drawerIndex);
+    document.getElementById("tickerTrack").style.animationPlayState = "paused";
+    document.getElementById("tickerDrawer").classList.add("open");
+    document.getElementById("tickerBackdrop").classList.add("open");
+    drawerIsOpen = true;
+  }
+
+  // A ticker item is "fully visible" if its entire width sits within the
+  // ticker bar's viewport (not clipped on either edge).
+  function isFullyVisible(el, container) {
+    var elRect = el.getBoundingClientRect();
+    var containerRect = container.getBoundingClientRect();
+    return elRect.left >= containerRect.left && elRect.right <= containerRect.right;
+  }
+
+  // Subsequent navigation (arrows, clicking another ticker title, swiping the
+  // drawer): moves the underline to the new item in place as long as it's
+  // already fully on screen. Only snaps/centers the track once navigation
+  // reaches an item that's partially or fully off screen.
+  function navigateTo(index) {
+    drawerIndex = ((index % TICKER_ITEMS.length) + TICKER_ITEMS.length) % TICKER_ITEMS.length;
+    renderDrawerContent(drawerIndex);
+    setActiveTickerItem(drawerIndex);
+    var ticker = document.getElementById("ticker");
+    var track = document.getElementById("tickerTrack");
+    var target = track.children[drawerIndex];
+    if (!isFullyVisible(target, ticker)) {
+      centerTrackOnIndex(drawerIndex);
+    }
+  }
+
+  function handleTickerItemActivate(index) {
+    if (!drawerIsOpen) {
+      openInitial(index);
+    } else {
+      navigateTo(index);
+    }
+  }
+
+  function closeDrawer() {
+    document.getElementById("tickerDrawer").classList.remove("open");
+    document.getElementById("tickerBackdrop").classList.remove("open");
+    drawerIsOpen = false;
+    setActiveTickerItem(-1);
+    var track = document.getElementById("tickerTrack");
+    track.style.animation = "";
+    track.style.transition = "";
+    track.style.transform = "";
+    track.style.animationPlayState = "";
+  }
+
+  function initTickerDrawer() {
+    var track = document.getElementById("tickerTrack");
+
+    track.addEventListener("click", function (e) {
+      var item = e.target.closest(".ticker-item");
+      if (!item) return;
+      handleTickerItemActivate(parseInt(item.getAttribute("data-index"), 10));
+    });
+
+    document.getElementById("drawerPrev").addEventListener("click", function () {
+      navigateTo(drawerIndex - 1);
+    });
+    document.getElementById("drawerNext").addEventListener("click", function () {
+      navigateTo(drawerIndex + 1);
+    });
+    document.getElementById("tickerBackdrop").addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", function (e) {
+      if (!drawerIsOpen) return;
+      if (e.key === "Escape") closeDrawer();
+      if (e.key === "ArrowLeft") navigateTo(drawerIndex - 1);
+      if (e.key === "ArrowRight") navigateTo(drawerIndex + 1);
+    });
+
+    // Swipe left/right on the drawer's explanation text to move prev/next —
+    // primary navigation gesture on mobile.
+    var swipeStartX = null;
+    var drawerContent = document.querySelector(".drawer-content");
+    drawerContent.addEventListener("touchstart", function (e) {
+      swipeStartX = e.touches[0].clientX;
+    }, { passive: true });
+    drawerContent.addEventListener("touchend", function (e) {
+      if (swipeStartX === null) return;
+      var deltaX = e.changedTouches[0].clientX - swipeStartX;
+      if (Math.abs(deltaX) > 40) {
+        if (deltaX < 0) navigateTo(drawerIndex + 1);
+        else navigateTo(drawerIndex - 1);
+      }
+      swipeStartX = null;
+    });
+  }
+  initTickerDrawer();
+
 
   function fitLineToWidth(container, el, extraScaleY) {
     el.style.transform = 'none';
