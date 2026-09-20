@@ -66,7 +66,7 @@
     padding: 0 14px;
   }
   .ticker-label.emphasis {
-    color: var(--black);
+    color: var(--white);
   }
   .ticker-arrow {
     display: inline-block;
@@ -136,11 +136,19 @@
     max-width: 480px;
     margin: 0 auto;
     box-sizing: border-box;
+    min-height: 100%;
+    display: flex;
+  }
+  .drawer-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .drawer-data {
     font-family: "Courier Prime", "Courier New", monospace;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 10pt;
     color: var(--white);
     margin-bottom: 10px;
   }
@@ -149,10 +157,9 @@
   }
   .drawer-sources {
     font-family: "Courier Prime", "Courier New", monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: #999;
     line-height: 1.5;
-    margin-bottom: 10px;
   }
   .drawer-sources a {
     color: var(--pink);
@@ -862,14 +869,15 @@
       if (e.key === "ArrowRight") navigateTo(drawerIndex + 1);
     });
 
-    // Swipe left/right on the drawer's explanation text to move prev/next —
+    // Swipe left/right anywhere on the open drawer (not just over the text,
+    // which may not fill the drawer's full height) to move prev/next —
     // primary navigation gesture on mobile.
     var swipeStartX = null;
-    var drawerContent = document.querySelector(".drawer-content");
-    drawerContent.addEventListener("touchstart", function (e) {
+    var drawerEl = document.getElementById("tickerDrawer");
+    drawerEl.addEventListener("touchstart", function (e) {
       swipeStartX = e.touches[0].clientX;
     }, { passive: true });
-    drawerContent.addEventListener("touchend", function (e) {
+    drawerEl.addEventListener("touchend", function (e) {
       if (swipeStartX === null) return;
       var deltaX = e.changedTouches[0].clientX - swipeStartX;
       if (Math.abs(deltaX) > 40) {
