@@ -745,8 +745,10 @@
 
   var tickerPointerId = null;
   var tickerDragStartX = 0;
+  var tickerDragStartY = 0;
   var tickerDragStartPos = 0;
   var tickerDragMoved = false;
+  var tickerGestureDecided = false;
   var TICKER_DRAG_THRESHOLD = 6;
 
   var tickerDownItem = null;
@@ -755,18 +757,41 @@
     if (e.pointerType === "mouse" && e.button !== 0) return;
     tickerPointerId = e.pointerId;
     tickerDragStartX = e.clientX;
+    tickerDragStartY = e.clientY;
     tickerDragStartPos = tickerPos;
     tickerDragMoved = false;
-    tickerDragging = true;
+    tickerGestureDecided = false;
     tickerDownItem = e.target.closest(".ticker-item");
-    tickerEl.classList.add("dragging");
-    try { tickerTrackEl.setPointerCapture(tickerPointerId); } catch (err) {}
+    // Don't capture the pointer or touch the transform yet — wait until we
+    // know whether this is a horizontal ticker-drag or a vertical page
+    // scroll that happens to start on the ticker bar. Grabbing capture
+    // immediately (the old behavior) fought with native scrolling on
+    // mobile and could snap the page back to the top mid-scroll.
   }
 
   function onTickerPointerMove(e) {
     if (tickerPointerId === null || e.pointerId !== tickerPointerId) return;
     var deltaX = e.clientX - tickerDragStartX;
-    if (Math.abs(deltaX) > TICKER_DRAG_THRESHOLD) tickerDragMoved = true;
+    var deltaY = e.clientY - tickerDragStartY;
+
+    if (!tickerGestureDecided) {
+      if (Math.abs(deltaX) < TICKER_DRAG_THRESHOLD && Math.abs(deltaY) < TICKER_DRAG_THRESHOLD) {
+        return; // not enough movement yet to tell
+      }
+      tickerGestureDecided = true;
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) {
+        // Vertical — this is a page scroll, not ours. Let go entirely so
+        // the browser handles the rest of the gesture untouched.
+        tickerPointerId = null;
+        return;
+      }
+      tickerDragging = true;
+      tickerEl.classList.add("dragging");
+      try { tickerTrackEl.setPointerCapture(tickerPointerId); } catch (err) {}
+    }
+
+    if (!tickerDragging) return;
+    tickerDragMoved = true;
     tickerPos = normalizeTickerPos(tickerDragStartPos + deltaX);
     applyTickerTransform();
   }
@@ -774,6 +799,7 @@
   function onTickerPointerUp(e) {
     if (tickerPointerId === null || e.pointerId !== tickerPointerId) return;
     var wasMoved = tickerDragMoved;
+    var wasDragging = tickerDragging;
     var item = tickerDownItem;
     tickerPointerId = null;
     tickerDragging = false;
@@ -786,7 +812,7 @@
       return;
     }
 
-    if (drawerIsOpen) {
+    if (wasDragging && drawerIsOpen) {
       navigateTo(nearestTickerIndex());
     }
   }
