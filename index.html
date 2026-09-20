@@ -115,10 +115,9 @@
     top: var(--ticker-height);
     left: 0;
     width: 100%;
-    height: 200px;
+    height: 228px;
     overflow-y: auto;
     background: var(--black);
-    border-bottom: 2px solid var(--pink);
     z-index: 999;
     box-sizing: border-box;
     transform: translateY(-12px);
@@ -141,30 +140,47 @@
   }
   .drawer-content {
     width: 100%;
+  }
+  .drawer-statement {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--white);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .drawer-statement .ticker-value {
+    color: var(--white);
+  }
+  .drawer-statement .ticker-arrow.up {
+    border-bottom-color: var(--white);
+  }
+  .drawer-statement .ticker-arrow.down {
+    border-top-color: var(--white);
   }
   .drawer-data {
     font-family: "Courier Prime", "Courier New", monospace;
-    font-size: 15px;
-    line-height: 14pt;
-    color: var(--white);
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--pink);
     margin-bottom: 10px;
   }
   .drawer-data strong {
-    color: var(--pink);
+    color: var(--white);
     font-weight: normal;
   }
-  .drawer-sources {
-    font-family: "Courier Prime", "Courier New", monospace;
-    font-size: 10px;
-    color: #999;
-    line-height: 1.5;
+  .drawer-data sup {
+    line-height: 0;
+    margin-left: 1px;
   }
-  .drawer-sources a {
-    color: var(--pink);
-    text-decoration: underline;
+  .drawer-data sup a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
   }
   .ticker-item.active {
     border-bottom: 2px solid var(--black);
@@ -380,8 +396,8 @@
   <div class="ticker-drawer" id="tickerDrawer">
     <div class="ticker-drawer-inner">
       <div class="drawer-content">
+        <div class="drawer-statement" id="drawerStatement"></div>
         <div class="drawer-data" id="drawerData"></div>
-        <div class="drawer-sources" id="drawerSources"></div>
       </div>
     </div>
   </div>
@@ -434,7 +450,7 @@
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
       status: "Data-backed estimate"
     } },
-    { label: "Closure/No Plan", direction: "up", value: "55%", citation: {
+    { label: "Closure/No Exit Plan", direction: "up", value: "55%", citation: {
       data: `<strong>22%</strong> of owners plan to close and <strong>33%</strong> have no long-term plan. Together, these categories equal <strong>55%</strong>.`,
       sources: [{ text: "Gallup — Most Small-Business Owners Lack a Succession Plan", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Calculated from survey results"
@@ -447,12 +463,12 @@
       sources: []
     } },
     { label: "Retirement Pressure", direction: "up", citation: {
-      data: `Among owners 55 and older, <strong>17% plan to sell or transfer their business within five years</strong>, while <strong>13% plan to close it</strong>. These figures signal approaching ownership transitions.`,
+      data: `Among owners 55 and older, <strong>17% plan to sell or transfer their business within five years</strong>, while <strong>13% plan to close it</strong>.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }, { text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Editorial synthesis of owner-age and succession-intention data"
     } },
     { label: "Silver Tsunami", direction: "down", value: "2.9M Biz", citation: {
-      data: `&ldquo;Silver Tsunami&rdquo; refers to the approaching ownership transition required for <strong>2.9 million businesses with owners over 55</strong>. The down arrow signals the passing on or closure of these businesses.`,
+      data: `&ldquo;Silver Tsunami&rdquo; refers to the approaching ownership transition required for <strong>2.9 million businesses with owners over 55</strong>.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
       status: "Data-backed figure with editorial framing"
     } },
@@ -465,7 +481,7 @@
       data: `GOATED`,
       sources: []
     } },
-    { label: "Closure Plan", direction: "down", value: "22%", citation: {
+    { label: "Exit Plan", direction: "down", value: "22%", citation: {
       data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business. The down arrow signals closure as undesirable.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Survey result with editorial arrow"
@@ -481,7 +497,7 @@
       status: "National polling estimate"
     } },
     { label: "Biz Lezzies", direction: "up", value: "69 PTS", citation: {
-      data: `Shout out to the dykes who raised this crazy queer!`,
+      data: `Shout out to the dykes who raised this activated queer!`,
       sources: []
     } },
     { label: "Queer Financial Security", direction: "down", value: "12 PTS", citation: {
@@ -519,7 +535,7 @@
       status: "Editorial stretch"
     } },
     { label: "Queer Wealth", direction: "down", citation: {
-      data: `<strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, versus <strong>79%</strong> hetero&mdash;a <strong>12-point gap</strong>. <strong>54% LGBTQI+ own homes versus 70%</strong> hetero, a <strong>16-point gap</strong>. LGBTQI+ adults are more likely to rent: <strong>42% versus 28%</strong>, a <strong>14-point gap</strong>.`,
+      data: `<strong>12-point disparity</strong> to queers who report doing financially okay (<strong>67% vs 79%</strong>). <strong>16-point disparity</strong> to queers who own homes (<strong>54% vs 70%</strong>).`,
       sources: [{ text: "Federal Reserve", url: "https://www.federalreserve.gov/publications/2022-economic-well-being-of-us-households-in-2021-overall-financial-well-being-in-2021.htm" }, { text: "Center for American Progress and NORC", url: "https://www.americanprogress.org/article/the-lgbtqi-community-reported-high-rates-of-discrimination-in-2024/" }],
       status: "Calculated comparison"
     } },
@@ -530,7 +546,7 @@
     } },
     { label: "Private Equity", direction: "down", citation: {
       data: `Don't sell to Private Equity! Keep your business in the family!`,
-      sources: [{ text: "NBER — Economic Effects of Private Equity Buyouts", url: "https://www.nber.org/system/files/working_papers/w26371/revisions/w26371.rev0.pdf" }],
+      sources: [],
       status: "Editorial position"
     } },
     { label: "GayInvest", direction: "up", value: "…", emphasis: true, citation: {
@@ -540,6 +556,23 @@
     } }
   ];
 
+  // Each distinct source claims one citation number the first time it
+  // appears (by URL, or by text when there's no URL) and keeps that same
+  // number everywhere else it's cited, instead of renumbering per drawer.
+  const SOURCE_NUMBERS = (function () {
+    var map = {};
+    var next = 1;
+    TICKER_ITEMS.forEach(function (item) {
+      var sources = item.citation && item.citation.sources;
+      if (!sources) return;
+      sources.forEach(function (s) {
+        var key = s.url || s.text;
+        if (!(key in map)) map[key] = next++;
+      });
+    });
+    return map;
+  })();
+
   function renderStatementInner(part) {
     var labelClass = "ticker-label" + (part.emphasis ? " emphasis" : "");
     var arrowHtml = part.direction ? "<span class=\"ticker-arrow " + part.direction + "\" aria-label=\"" + part.direction + "\"></span>" : "";
@@ -548,12 +581,15 @@
     return "<span class=\"" + labelClass + "\">" + part.label + "</span>" + arrowHtml + valueHtml;
   }
 
+  function renderItemInnerHTML(item) {
+    return item.parts
+      ? item.parts.map(renderStatementInner).join("<span style=\"margin-left:7px\"></span>")
+      : renderStatementInner(item);
+  }
+
   function renderTickerItems(items) {
     return items.map(function (item, i) {
-      var inner = item.parts
-        ? item.parts.map(renderStatementInner).join("<span style=\"margin-left:7px\"></span>")
-        : renderStatementInner(item);
-      return "<span class=\"ticker-item\" data-index=\"" + i + "\">" + inner + "</span>";
+      return "<span class=\"ticker-item\" data-index=\"" + i + "\">" + renderItemInnerHTML(item) + "</span>";
     }).join("");
   }
 
@@ -789,23 +825,19 @@
   function renderDrawerContent(index) {
     var item = TICKER_ITEMS[index];
     var c = item.citation;
+    var statementEl = document.getElementById("drawerStatement");
     var dataEl = document.getElementById("drawerData");
-    var sourcesEl = document.getElementById("drawerSources");
+    statementEl.innerHTML = renderItemInnerHTML(item);
     if (c) {
-      dataEl.innerHTML = c.data;
-      if (c.sources && c.sources.length) {
-        sourcesEl.innerHTML = "Source: " + c.sources.map(function (s) {
-          return s.url ? "<a href=\"" + s.url + "\" target=\"_blank\" rel=\"noopener\">" + s.text + "</a>" : s.text;
-        }).join("; ");
-        sourcesEl.style.display = "";
-      } else {
-        sourcesEl.innerHTML = "";
-        sourcesEl.style.display = "none";
-      }
+      var citationMarks = (c.sources || []).map(function (s) {
+        var num = "[" + SOURCE_NUMBERS[s.url || s.text] + "]";
+        return s.url
+          ? "<sup><a href=\"" + s.url + "\" target=\"_blank\" rel=\"noopener\" title=\"" + s.text + "\">" + num + "</a></sup>"
+          : "<sup title=\"" + s.text + "\">" + num + "</sup>";
+      }).join("");
+      dataEl.innerHTML = c.data + citationMarks;
     } else {
       dataEl.textContent = "This one's just for fun — no data behind it.";
-      sourcesEl.innerHTML = "";
-      sourcesEl.style.display = "none";
     }
   }
 
@@ -886,6 +918,17 @@
         else navigateTo(drawerIndex - 1);
       }
       swipeStartX = null;
+    });
+
+    // Tap (not swipe) on the left or right half of the drawer also moves
+    // prev/next. A real swipe involves touch movement, which suppresses
+    // the browser's synthetic click, so this only fires for actual taps
+    // and ordinary mouse clicks — never alongside the swipe handler above.
+    drawerEl.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return; // let source links open normally
+      var rect = drawerEl.getBoundingClientRect();
+      var isLeftHalf = (e.clientX - rect.left) < rect.width / 2;
+      navigateTo(isLeftHalf ? drawerIndex - 1 : drawerIndex + 1);
     });
   }
   initTickerDrawer();
