@@ -409,6 +409,7 @@
     <div id="signup-thanks" class="thanks" hidden>Thanks for cruising!</div>
   </section>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   /* ---- Market ticker ----
      Edit TICKER_ITEMS below to add/remove/reorder entries.
@@ -416,101 +417,118 @@
   */
   const TICKER_ITEMS = [
     { label: "55+ Owned Biz", direction: "up", value: "$6.5T Rev", citation: {
-      data: `Approximately 2.9 million privately held U.S. businesses with employees and owners over 55 collectively generate an estimated <strong>$6.5T in annual revenue</strong>. This is revenue&mdash;not enterprise value, sale value or revenue immediately at risk.`,
+      data: `Approximately 2.9 million private U.S. businesses with owners over 55 collectively generate an estimated <strong>$6.5T in annual revenue</strong>.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
       status: "Data-backed estimate"
     } },
     { label: "Biz Owners 55+", direction: "up", value: "2.9M", citation: {
-      data: `Approximately <strong>2.9 million privately held U.S. businesses with employees have owners over 55</strong>. &ldquo;Owners&rdquo; is compact ticker shorthand: the figure counts businesses, not 2.9 million individual owners. A business may have multiple owners.`,
+      data: `Approximately <strong>2.9 million privately held U.S. businesses have owners over 55</strong>. A business may have multiple owners.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
-      status: "Data-backed estimate with shorthand"
+      status: "Data-backed estimate"
     } },
     { label: "Closure/No Plan", direction: "up", value: "55%", citation: {
-      data: `Gallup found that <strong>22%</strong> of owners planned to close and <strong>33%</strong> had no long-term plan or were unsure. Together, these categories equal <strong>55%</strong>.`,
+      data: `<strong>22%</strong> of owners plan to close and <strong>33%</strong> have no long-term plan. Together, these categories equal <strong>55%</strong>.`,
       sources: [{ text: "Gallup — Most Small-Business Owners Lack a Succession Plan", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Calculated from survey results"
     } },
     { parts: [
       { label: "Biz Daddy", direction: "down" },
       { label: "4 Biz Boy", direction: "up" }
-    ] },
+    ], citation: {
+      data: `Or vice versa?!?!`,
+      sources: []
+    } },
     { label: "Retirement Pressure", direction: "up", citation: {
-      data: `GayInvest shorthand for the succession pressure created by an aging business-owner population. Approximately <strong>2.9 million employer businesses have owners over 55</strong>. Among owners 55 and older, <strong>17% planned to sell or transfer their business within five years</strong>, while <strong>13% planned to close it</strong>. These figures establish approaching ownership transitions, although no study calculates a national &ldquo;retirement pressure&rdquo; index.`,
+      data: `Among owners 55 and older, <strong>17% plan to sell or transfer their business within five years</strong>, while <strong>13% plan to close it</strong>. These figures signal approaching ownership transitions.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }, { text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Editorial synthesis of owner-age and succession-intention data"
     } },
     { label: "Silver Tsunami", direction: "down", value: "2.9M Biz", citation: {
-      data: `Refers to the approaching ownership transition involving approximately <strong>2.9 million employer businesses with owners over 55</strong>. The down arrow signals concern about disruption, closure and lost continuity&mdash;not a decline of 2.9 million businesses.`,
+      data: `&ldquo;Silver Tsunami&rdquo; refers to the approaching ownership transition required for <strong>2.9 million businesses with owners over 55</strong>. The down arrow signals the passing on or closure of these businesses.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
       status: "Data-backed figure with editorial framing"
     } },
     { label: "LGBTQ+ Pop 50+", direction: "up", value: "3%", citation: {
-      data: `Gallup found that LGBTQ+ identification was <strong>3% or less among adults aged 50 and older</strong>, depending on the specific age group. The ticker simplifies this to 3%.`,
+      data: `LGBTQ+ self-identification was <strong>3% or less among adults aged 50 and older</strong>.`,
       sources: [{ text: "Gallup — LGBTQ+ Identification Holds at 9%", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
       status: "Data-backed with simplified wording"
     } },
-    { label: "Vers", direction: "up", value: "4 Side" },
+    { label: "Vers", direction: "up", value: "4 Side", citation: {
+      data: `GOATED`,
+      sources: []
+    } },
     { label: "Closure Plan", direction: "down", value: "22%", citation: {
-      data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business. The down arrow identifies closure as undesirable; it does not indicate a 22% decline.`,
+      data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business. The down arrow signals closure as undesirable.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Survey result with editorial arrow"
     } },
     { label: "LGBTQ+ Owned Biz", direction: "up", value: "6%", citation: {
-      data: `Approximately <strong>6% of small employer businesses are at least partially owned by someone identifying as LGBTQ+</strong>. &ldquo;At least partially owned&rdquo; does not necessarily mean majority LGBTQ+ ownership.`,
+      data: `Approximately <strong>6% of small businesses are at least partially owned by someone identifying as LGBTQ+</strong>.`,
       sources: [{ text: "Federal Reserve Banks — LGBTQ-Owned Firms", url: "https://www.fedsmallbusiness.org/categories/lgbtq-owned-firms" }],
       status: "Survey estimate"
     } },
     { label: "LGBTQ+ Pop 18+", direction: "up", value: "9%", citation: {
-      data: `Gallup estimates that <strong>9% of U.S. adults identified as LGBTQ+ in 2025</strong>, more than double its 3.5% measurement in 2012.`,
+      data: `<strong>9% of U.S. adults identified as LGBTQ+ in 2025</strong>, more than double its 3.5% measurement in 2012.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
       status: "National polling estimate"
     } },
-    { label: "Biz Lezzies", direction: "up", value: "69 PTS" },
+    { label: "Biz Lezzies", direction: "up", value: "69 PTS", citation: {
+      data: `Shout out to the dykes who raised this crazy queer!`,
+      sources: []
+    } },
     { label: "Queer Financial Security", direction: "down", value: "12 PTS", citation: {
-      data: `In 2021, <strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, compared with <strong>79% of non-LGBTQ+ adults</strong>&mdash;a <strong>12-percentage-point gap</strong>. This is a disparity between groups, not a 12-point decline over time.`,
+      data: `In 2021, <strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, compared with <strong>79% of non-LGBTQ+ adults</strong>&mdash;a disparity for queers.`,
       sources: [{ text: "Federal Reserve — Economic Well-Being of U.S. Households in 2021", url: "https://www.federalreserve.gov/publications/2022-economic-well-being-of-us-households-in-2021-overall-financial-well-being-in-2021.htm" }],
       status: "Calculated comparison"
     } },
     { label: "Queer Poverty Gap", direction: "up", value: "5 PTS", citation: {
-      data: `In 2021, <strong>17% of LGBT adults</strong> lived in poverty, compared with <strong>12% of non-LGBT adults</strong>&mdash;a <strong>5-percentage-point disparity</strong>. It does not mean the LGBT poverty rate increased by five points over time.`,
+      data: `In 2021, <strong>17% of LGBT adults</strong> lived in poverty, compared with <strong>12% of non-LGBT adults</strong>&mdash;a <strong>5-percentage-point disparity</strong> for queers.`,
       sources: [{ text: "Williams Institute — LGBT Poverty in the United States", url: "https://williamsinstitute.law.ucla.edu/publications/lgbt-poverty-us/" }],
       status: "Calculated comparison"
     } },
     { label: "Queer Biz Impact", direction: "up", value: "$1.7T+", citation: {
-      data: `NGLCC estimates that LGBT-owned businesses represented in its research contribute <strong>more than $1.7T in economic impact</strong> to the U.S. economy. This is not queer household wealth, annual revenue or enterprise value.`,
+      data: `NGLCC estimates that its members generate <strong>more than $1.7T in economic impact</strong> to the U.S. economy.`,
       sources: [{ text: "NGLCC — America's LGBT Economy", url: "https://nglcc.org/wp-content/uploads/2022/02/REPORT-NGLCC-Americas-LGBT-Economy-1-1.pdf" }],
       status: "Industry-organization estimate"
     } },
     { label: "Str8 Heirs", direction: "down", value: "666 PTS", citation: {
-      data: `GayInvest's rejection of treating heterosexual family inheritance as the automatic succession route. The <strong>666-point movement is fictional</strong>. Gallup found that 26% of owners plan to give their business to a family member or someone else, but the survey does not identify heirs by sexual orientation or separate family from other recipients in the published figure.`,
+      data: `Say it with me: NO STR8 HEIRS TO QUEER WEALTH!!!`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Editorial joke with related context"
     } },
     { label: "Biz Sale Plans", direction: "up", value: "23%", citation: {
-      data: `<strong>23% of surveyed business owners</strong> said their long-term plan was to sell the business. This measures owners' intentions&mdash;not completed or successful business sales.`,
+      data: `<strong>23% of surveyed business owners</strong> said their long-term plan was to sell the business.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Survey result"
     } },
-    { label: "BB", direction: "up", value: "2026%" },
+    { label: "BB", direction: "up", value: "2026%", citation: {
+      data: `Prep has been sexlife-changing, no?`,
+      sources: []
+    } },
     { label: "Successor Potential", direction: "up", value: "23%", citation: {
-      data: `The <strong>23%</strong> represents the share of adults under 30 who identified as LGBTQ+ in 2025. GayInvest interprets this larger younger queer population as potential successors, but Gallup did not measure business-acquisition interest, readiness or access to capital.`,
+      data: `The <strong>23%</strong> represents the share of adults under 30 who identified as LGBTQ+ in 2025. This one's a stretch :)`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx" }],
-      status: "Editorial inference using real data"
+      status: "Editorial stretch"
+    } },
+    { label: "Queer Wealth", direction: "down", citation: {
+      data: `<strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, versus <strong>79%</strong> hetero&mdash;a <strong>12-point gap</strong>. <strong>54% LGBTQI+ own homes versus 70%</strong> hetero, a <strong>16-point gap</strong>. LGBTQI+ adults are more likely to rent: <strong>42% versus 28%</strong>, a <strong>14-point gap</strong>.`,
+      sources: [{ text: "Federal Reserve", url: "https://www.federalreserve.gov/publications/2022-economic-well-being-of-us-households-in-2021-overall-financial-well-being-in-2021.htm" }, { text: "Center for American Progress and NORC", url: "https://www.americanprogress.org/article/the-lgbtqi-community-reported-high-rates-of-discrimination-in-2024/" }],
+      status: "Calculated comparison"
     } },
     { label: "Legacy At Risk", direction: "down", value: "55%", citation: {
-      data: `The figure combines the <strong>22% planning closure</strong> and <strong>33% with no plan or unsure</strong>. GayInvest interprets those circumstances as threatening business continuity, employment, community relationships and owner legacy. Gallup did not directly measure &ldquo;legacy at risk.&rdquo;`,
+      data: `The figure combines the <strong>22% planning closure</strong> and <strong>33% with no plan or unsure</strong>.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Editorial interpretation of survey data"
     } },
     { label: "Private Equity", direction: "down", citation: {
-      data: `Expresses GayInvest's preference for personal, community and relationship-based succession over institutional acquisition. Research finds that PE outcomes vary substantially by transaction type, so the ticker does not attach a universal negative percentage.`,
+      data: `Don't sell to Private Equity! Keep your business in the family!`,
       sources: [{ text: "NBER — Economic Effects of Private Equity Buyouts", url: "https://www.nber.org/system/files/working_papers/w26371/revisions/w26371.rev0.pdf" }],
       status: "Editorial position"
     } },
-    { label: "GayInvest", direction: "up", emphasis: true, citation: {
-      data: `Optimistic brand sign-off representing GayInvest's mission and proposed succession model.`,
+    { label: "GayInvest", direction: "up", value: "…", emphasis: true, citation: {
+      data: `The number of individual visits this page has received.`,
       sources: [{ text: "GayInvest editorial language", url: null }],
-      status: "Brand statement"
+      status: "Live counter (approximate — one count per browser, not per person)"
     } }
   ];
 
@@ -537,6 +555,69 @@
     track.innerHTML = html + html; // duplicated for seamless loop
   }
   initTicker();
+
+  /* ---- Unique visitor counter (shown as the "GayInvest" ticker value) ----
+     Backed by Supabase. The publishable key below is safe to expose
+     client-side by design — access is enforced by Row Level Security:
+     the `visitors`/`page_views` tables only accept inserts from it, and
+     the unique count comes from a security-definer function, so raw
+     visitor rows are never readable from the browser.
+     Each browser gets a random UUID (localStorage) upserted into
+     `visitors`, so repeat visits from the same browser only count once;
+     every load also logs a row in `page_views` for future analytics
+     (path, referrer, timestamp) without needing a schema change later.
+  */
+  var SUPABASE_URL = "https://kqydmosqdaztyvfuuuqc.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_xgMN2MqQmBScuAfptDr3Fw_ZVNn3Gwc";
+
+  function getOrCreateVisitorId() {
+    var STORAGE_KEY = "gi_visitor_id";
+    try {
+      var existing = localStorage.getItem(STORAGE_KEY);
+      if (existing) return existing;
+      var id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0;
+        var v = c === "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      localStorage.setItem(STORAGE_KEY, id);
+      return id;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function initViewCounter() {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") return;
+    var gayInvestIndex = TICKER_ITEMS.findIndex(function (item) { return item.label === "GayInvest"; });
+    if (gayInvestIndex === -1) return;
+
+    function renderCount(n) {
+      var text = Number(n).toLocaleString();
+      var valueEls = document.querySelectorAll('.ticker-item[data-index="' + gayInvestIndex + '"] .ticker-value');
+      for (var i = 0; i < valueEls.length; i++) valueEls[i].textContent = text;
+    }
+
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    var visitorId = getOrCreateVisitorId();
+
+    // A plain insert, not upsert: the visitor_id primary key already
+    // rejects duplicates on repeat visits, and that conflict is swallowed
+    // below same as any other tracking failure.
+    var trackVisit = visitorId
+      ? sb.from("visitors").insert({ visitor_id: visitorId })
+      : Promise.resolve();
+    var trackView = visitorId
+      ? sb.from("page_views").insert({ visitor_id: visitorId, path: location.pathname, referrer: document.referrer || null })
+      : Promise.resolve();
+
+    Promise.all([trackVisit, trackView]).catch(function () {}).then(function () {
+      return sb.rpc("get_unique_visitor_count");
+    }).then(function (result) {
+      if (result && result.data != null) renderCount(result.data);
+    }).catch(function () { /* leave the placeholder if Supabase is unreachable */ });
+  }
+  initViewCounter();
 
   /* ---- Ticker citation drawer ---- */
   var drawerIndex = 0;
@@ -704,10 +785,15 @@
     var sourcesEl = document.getElementById("drawerSources");
     if (c) {
       dataEl.innerHTML = c.data;
-      sourcesEl.innerHTML = "Source: " + c.sources.map(function (s) {
-        return s.url ? "<a href=\"" + s.url + "\" target=\"_blank\" rel=\"noopener\">" + s.text + "</a>" : s.text;
-      }).join("; ");
-      sourcesEl.style.display = "";
+      if (c.sources && c.sources.length) {
+        sourcesEl.innerHTML = "Source: " + c.sources.map(function (s) {
+          return s.url ? "<a href=\"" + s.url + "\" target=\"_blank\" rel=\"noopener\">" + s.text + "</a>" : s.text;
+        }).join("; ");
+        sourcesEl.style.display = "";
+      } else {
+        sourcesEl.innerHTML = "";
+        sourcesEl.style.display = "none";
+      }
     } else {
       dataEl.textContent = "This one's just for fun — no data behind it.";
       sourcesEl.innerHTML = "";
