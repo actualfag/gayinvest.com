@@ -55,6 +55,7 @@
     will-change: transform;
   }
   .ticker-item {
+    position: relative;
     display: inline-flex;
     align-items: center;
     font-family: "IBM Plex Mono", "Courier New", monospace;
@@ -170,7 +171,7 @@
     margin-bottom: 10px;
   }
   .drawer-data strong {
-    color: var(--white);
+    color: var(--pink);
     font-weight: normal;
   }
   .drawer-data sup {
@@ -178,12 +179,17 @@
     margin-left: 1px;
   }
   .drawer-data sup a {
-    color: var(--white);
+    color: var(--pink);
     text-decoration: none;
     font-weight: 600;
   }
-  .ticker-item.active {
-    border-bottom: 2px solid var(--black);
+  .ticker-item.active::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: -3px;
+    border-bottom: 2px dotted var(--black);
   }
 
   /* Hero / wordmark */
@@ -463,12 +469,12 @@
       sources: []
     } },
     { label: "Retirement Pressure", direction: "up", citation: {
-      data: `Among owners 55 and older, <strong>17% plan to sell or transfer their business within five years</strong>, while <strong>13% plan to close it</strong>.`,
+      data: `Of owners 55+, <strong>17% plan to sell or transfer their business within 5 years</strong>, while <strong>13% plan to close it</strong>.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }, { text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Editorial synthesis of owner-age and succession-intention data"
     } },
     { label: "Silver Tsunami", direction: "down", value: "2.9M Biz", citation: {
-      data: `&ldquo;Silver Tsunami&rdquo; refers to the approaching ownership transition required for <strong>2.9 million businesses with owners over 55</strong>.`,
+      data: `This delightfully gay term refers to the impending ownership transition of the <strong>2.9 million businesses owned by 55+</strong>.`,
       sources: [{ text: "Project Equity", url: "https://project-equity.org/wp-content/uploads/2024/05/Project_Equity_EOE_Summit_2024_5-02.pdf" }],
       status: "Data-backed figure with editorial framing"
     } },
@@ -517,7 +523,7 @@
     } },
     { label: "Str8 Heirs", direction: "down", value: "666 PTS", citation: {
       data: `Say it with me: NO STR8 HEIRS TO QUEER WEALTH!!!`,
-      sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
+      sources: [],
       status: "Editorial joke with related context"
     } },
     { label: "Biz Sale Plans", direction: "up", value: "23%", citation: {
@@ -551,7 +557,7 @@
     } },
     { label: "GayInvest", direction: "up", value: "…", emphasis: true, citation: {
       data: `The number of individual visits this page has received.`,
-      sources: [{ text: "GayInvest editorial language", url: null }],
+      sources: [],
       status: "Live counter (approximate — one count per browser, not per person)"
     } }
   ];
@@ -638,8 +644,14 @@
 
     function renderCount(n) {
       var text = Number(n).toLocaleString();
+      TICKER_ITEMS[gayInvestIndex].value = text;
       var valueEls = document.querySelectorAll('.ticker-item[data-index="' + gayInvestIndex + '"] .ticker-value');
       for (var i = 0; i < valueEls.length; i++) valueEls[i].textContent = text;
+      // If the drawer is already open on this statement, refresh its
+      // restated title too, instead of leaving the "…" placeholder shown.
+      if (drawerIsOpen && drawerIndex === gayInvestIndex) {
+        renderDrawerContent(gayInvestIndex);
+      }
     }
 
     var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -812,14 +824,33 @@
     for (var j = 0; j < current.length; j++) current[j].classList.add("active");
   }
 
+  // The track holds two duplicated copies of the list back-to-back (for the
+  // seamless loop), so any given statement has two equivalent on-screen
+  // positions exactly one track-width apart. Always aim for whichever one
+  // is closer to the current scroll position, so navigating never has to
+  // sweep across the whole track to reach the "wrong" copy.
   function centerTrackOnIndex(index) {
     var target = tickerTrackEl.children[index];
     if (!target) return;
     var offset = target.offsetLeft + target.offsetWidth / 2 - tickerEl.clientWidth / 2;
-    tickerPos = normalizeTickerPos(-offset);
+    var canonical = normalizeTickerPos(-offset);
+    var candidates = [canonical, canonical - tickerHalfWidth, canonical + tickerHalfWidth];
+    var best = candidates[0];
+    var bestDist = Math.abs(candidates[0] - tickerPos);
+    for (var i = 1; i < candidates.length; i++) {
+      var dist = Math.abs(candidates[i] - tickerPos);
+      if (dist < bestDist) { bestDist = dist; best = candidates[i]; }
+    }
+    tickerPos = best;
     tickerTrackEl.style.transition = "transform 0.4s ease";
     applyTickerTransform();
-    window.setTimeout(function () { tickerTrackEl.style.transition = ""; }, 400);
+    window.setTimeout(function () {
+      tickerTrackEl.style.transition = "";
+      // Snap the (visually identical) position back into the canonical
+      // range so later math doesn't keep drifting outward.
+      tickerPos = normalizeTickerPos(tickerPos);
+      applyTickerTransform();
+    }, 400);
   }
 
   function renderDrawerContent(index) {
