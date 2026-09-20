@@ -442,6 +442,21 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Mobile browsers fire "resize" when the address bar collapses/expands
+  // during scrolling — only the viewport HEIGHT changes then, never the
+  // width. Both fitHero() and computeTickerMetrics() only care about
+  // width, so without this guard they'd re-run (and fitHero in particular
+  // forces several synchronous layout reflows) on every scroll-triggered
+  // resize, which was heavy enough mid-scroll to glitch the page.
+  var lastViewportWidth = window.innerWidth;
+  function onlyOnWidthChange(fn) {
+    return function () {
+      if (window.innerWidth === lastViewportWidth) return;
+      lastViewportWidth = window.innerWidth;
+      fn();
+    };
+  }
+
   /* ---- Market ticker ----
      Edit TICKER_ITEMS below to add/remove/reorder entries.
      Each entry: { label, direction: "up"|"down"|null, value?: string, emphasis?: boolean }
@@ -834,10 +849,15 @@
     tickerTrackEl.addEventListener("pointermove", onTickerPointerMove);
     tickerTrackEl.addEventListener("pointerup", onTickerPointerUp);
     tickerTrackEl.addEventListener("pointercancel", onTickerPointerCancel);
-    tickerEl.addEventListener("mouseenter", function () { tickerPaused = true; });
-    tickerEl.addEventListener("mouseleave", function () { tickerPaused = false; });
+    // pointerenter/pointerleave with a pointerType check (not
+    // mouseenter/mouseleave) — mobile browsers fire synthetic mouse events
+    // on tap with no matching "leave" afterward, which left the ticker
+    // stuck paused after tapping to open a statement. Real mouse hover on
+    // desktop still pauses/resumes as before.
+    tickerEl.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") tickerPaused = true; });
+    tickerEl.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") tickerPaused = false; });
 
-    window.addEventListener("resize", computeTickerMetrics);
+    window.addEventListener("resize", onlyOnWidthChange(computeTickerMetrics));
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(computeTickerMetrics);
     }
@@ -908,6 +928,9 @@
     document.getElementById("tickerDrawer").classList.add("open");
     document.getElementById("tickerBackdrop").classList.add("open");
     drawerIsOpen = true;
+    if (!isItemFullyVisible(drawerIndex)) {
+      centerTrackOnIndex(drawerIndex);
+    }
   }
 
   // A ticker item is "fully visible" if its entire width sits within the
@@ -918,6 +941,17 @@
     return elRect.left >= containerRect.left && elRect.right <= containerRect.right;
   }
 
+  // The track holds two duplicated copies of every item (for the seamless
+  // loop), so whichever copy the user actually sees/tapped might not be
+  // the first one. Checking only children[index] (the first copy) could
+  // wrongly report "off screen" — and trigger an unwanted center-jump —
+  // even when the item is already fully visible as its second copy.
+  function isItemFullyVisible(index) {
+    var copyA = tickerTrackEl.children[index];
+    var copyB = tickerTrackEl.children[index + TICKER_ITEMS.length];
+    return (!!copyA && isFullyVisible(copyA, tickerEl)) || (!!copyB && isFullyVisible(copyB, tickerEl));
+  }
+
   // Subsequent navigation (arrows, clicking another ticker title, swiping the
   // drawer): moves the underline to the new item in place as long as it's
   // already fully on screen. Only snaps/centers the track once navigation
@@ -926,10 +960,7 @@
     drawerIndex = ((index % TICKER_ITEMS.length) + TICKER_ITEMS.length) % TICKER_ITEMS.length;
     renderDrawerContent(drawerIndex);
     setActiveTickerItem(drawerIndex);
-    var ticker = document.getElementById("ticker");
-    var track = document.getElementById("tickerTrack");
-    var target = track.children[drawerIndex];
-    if (!isFullyVisible(target, ticker)) {
+    if (!isItemFullyVisible(drawerIndex)) {
       centerTrackOnIndex(drawerIndex);
     }
   }
@@ -937,6 +968,8 @@
   function handleTickerItemActivate(index) {
     if (!drawerIsOpen) {
       openInitial(index);
+    } else if (index === drawerIndex) {
+      closeDrawer();
     } else {
       navigateTo(index);
     }
@@ -1026,7 +1059,7 @@
     fitTaglineWithSpacing(hero, document.querySelector('.tagline'), 0.75);
   }
   fitHero();
-  window.addEventListener('resize', fitHero);
+  window.addEventListener('resize', onlyOnWidthChange(fitHero));
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(fitHero);
   }
