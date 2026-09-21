@@ -328,7 +328,7 @@
     font-weight: 400;
     line-height: 1.05;
     text-transform: uppercase;
-    margin-bottom: -8.91px; /* matches the wordmark-to-tagline gap */
+    margin-bottom: -5.91px; /* matches the wordmark-to-tagline gap, +3px more breathing room */
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.15s ease;
@@ -357,13 +357,18 @@
     color: var(--white);
   }
   .bio strong { color: var(--pink); }
-  .bio strong.white { color: var(--white); }
   .inline-link { color: inherit; text-decoration: underline; }
 
   /* Signup */
   .signup {
     background: #141414;
-    padding: 28px 20px 40px;
+    padding: 28px 16px 40px; /* matches the bio copy's width above */
+    text-align: center;
+  }
+  .newsletter-box {
+    border: 1px solid var(--pink);
+    border-bottom: none; /* the ticket-input's own top border completes this seam — no doubled-up line */
+    padding: 18px 16px;
     text-align: center;
   }
   .email-now {
@@ -380,9 +385,14 @@
     text-transform: uppercase;
     font-weight: 700;
     margin-bottom: -3px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0px; /* must stay non-scaling-free — JS fits this by font-size alone */
     color: var(--white);
+    white-space: nowrap;
+    display: inline-block; /* shrink-to-fit, so scrollWidth reflects the text, not the box */
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
+  .signup h2.fitted { opacity: 1; }
   .signup h2 .pink { color: var(--pink); }
   .wink {
     font-family: "Oswald", sans-serif;
@@ -390,7 +400,7 @@
     text-transform: uppercase;
     font-weight: 300;
     color: var(--pink);
-    margin-bottom: 20px;
+    margin-bottom: 0;
     white-space: nowrap;
     display: inline-block;
     opacity: 0;
@@ -399,28 +409,42 @@
   .wink.fitted { opacity: 1; }
   .wink .white { color: var(--white); }
   .signup form {
+    display: block;
+  }
+  .ticket-input {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: stretch;
+    border: 1px solid var(--pink);
+    height: 42px;
   }
-  .signup input[type="email"] {
-    background: var(--black);
-    border: 1px solid var(--white);
-    color: var(--white);
-    padding: 12px 14px;
-    min-height: 44px;
-    border-radius: 4px;
-    font-family: "Inter", sans-serif;
-    font-size: clamp(16px, 4vw, 19px);
-  }
-  .signup input[type="email"]::placeholder { color: var(--white); opacity: 0.5; }
-  .signup .btn {
-    background: var(--pink);
-    color: var(--black);
+  .ticket-input input[type="email"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+    background: transparent;
     border: none;
+    color: var(--white);
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-size: clamp(13px, 3.6vw, 15px);
+    padding: 0 14px;
+  }
+  .ticket-input input[type="email"]:focus { outline: none; }
+  .ticket-input input[type="email"]::placeholder { color: var(--white); opacity: 0.5; }
+  .ticket-submit {
+    flex: 0 0 auto;
+    width: 42px; /* matches the box's 42px height exactly — a perfect square */
+    background: var(--pink);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: clamp(16px, 4vw, 19px);
-    padding: 12px;
+    font-size: 11px; /* controls the reused ticker-arrow's em-based size */
+  }
+  .ticket-submit .ticker-arrow {
+    margin-left: 0;
+    transform: rotate(90deg);
   }
   .signup .or {
     color: var(--white);
@@ -469,21 +493,26 @@
     <div class="headline">I'm <span class="pink">Cruising</span> For Connections</div>
     <div class="subline">Not for sex - <span class="pink">For succession</span></div>
     <div class="bio">
-      <p>I'm on the hunt to buy my first business. <strong>A gay one.</strong> Turns out, this is harder than I thought.</p>
-      <p>So I'm starting GAYINVEST.COM to find queer business owners thinking about what's next &mdash; and connect them with queer buyers like me.</p>
-      <p>Are you one? Do you know one? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong> I always cruise confidentially ;)</p>
-      <p>Let's keep our business <strong class="white">in the family.</strong></p>
+      <p>I'm on the hunt to buy my first business. <strong>A gay one.</strong> Turns out, it's harder than I thought.</p>
+      <p>So I'm starting <strong>GAYINVEST.COM</strong> to find <strong>queer business owners</strong> thinking about what's next &mdash; and connect them with <strong>queer buyers</strong> like me.</p>
+      <p>Are you one? Do you know someone? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong></p>
+      <p><strong>It's true what they say about me &mdash;</strong> I'll chat up any potential seller, buyer, broker, or adviser with a pulse ;)</p>
+      <p>Worried about others finding out? <strong>I always cruise confidentially.</strong></p>
     </div>
   </section>
 
   <section class="signup">
     <p class="email-now"><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email Lincoln Tonight!</a></p>
     <p class="or">or</p>
-    <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
-    <p class="wink">Hot leads - <span class="white">Serious business</span></p>
+    <div class="newsletter-box">
+      <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
+      <p class="wink">Hot leads - <span class="white">Serious business</span></p>
+    </div>
     <form id="signup-form" action="https://formspree.io/f/xkjgwden" method="POST">
-      <input type="email" name="email" placeholder="your@email.com" required>
-      <button class="btn" type="submit">Sign Me Up</button>
+      <div class="ticket-input">
+        <input type="email" name="email" placeholder="your@email.com" required>
+        <button class="ticket-submit" type="submit" aria-label="Sign up"><span class="ticker-arrow up" aria-hidden="true"></span></button>
+      </div>
     </form>
     <div id="signup-thanks" class="thanks" hidden>Thanks for cruising!</div>
   </section>
@@ -1144,36 +1173,23 @@
     const currentSpacing = parseFloat(subline.style.letterSpacing) || 0;
     subline.style.letterSpacing = (currentSpacing + 0.11) + 'px';
   }
-  function fitWink() {
-    // Stretch "Hot leads - Serious business" out to exactly match the
-    // newsletter heading's rendered width above it, using only even
-    // letter-spacing (same clean look as the subline) — no font-size
-    // change, no word-spacing. The box widths now match exactly (that
-    // was the real bug — see the font-load fix above); this only
-    // compensates for "H" (light weight, minimal left bearing) landing
-    // left of "G" (bold, rounded, more left bearing) and "S" (light)
-    // overshooting past "R" (bold) on the right.
+  function fitNewsletterHeading() {
+    // The tagline ("Hot leads - Serious business") is now the fixed
+    // reference — it renders at its own natural width, no stretching —
+    // and the heading above it shrinks via font-size to match exactly,
+    // same approach as fitHeadline() matching the hero wordmark.
     const heading = document.querySelector('.signup h2');
     const wink = document.querySelector('.wink');
-    const available = heading.getBoundingClientRect().width - 2;
-    wink.style.marginLeft = '1px';
     wink.style.letterSpacing = '0px';
-    const naturalWidth = wink.scrollWidth;
-    const numChars = wink.textContent.length;
-    let letterSpacing = numChars > 1 ? (available - naturalWidth) / (numChars - 1) : 0;
-    wink.style.letterSpacing = letterSpacing + 'px';
-    // Measure the actual result and correct any residual error once.
-    const error = available - wink.scrollWidth;
-    if (Math.abs(error) > 0.5 && numChars > 1) {
-      letterSpacing += error / (numChars - 1);
-      wink.style.letterSpacing = letterSpacing + 'px';
-    }
+    wink.style.marginLeft = '0px';
+    const available = wink.scrollWidth;
+    fitLineToPixelWidth(heading, available);
   }
   function fitAll() {
     fitHero();
     fitHeadline();
     fitSubline();
-    fitWink();
+    fitNewsletterHeading();
   }
   fitAll();
   window.addEventListener('resize', onlyOnWidthChange(fitAll));
@@ -1196,6 +1212,7 @@
     document.querySelector('.headline').classList.add('fitted');
     document.querySelector('.subline').classList.add('fitted');
     document.querySelector('.wink').classList.add('fitted');
+    document.querySelector('.signup h2').classList.add('fitted');
   }
   if (document.fonts && document.fonts.load) {
     Promise.all([
