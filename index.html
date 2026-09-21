@@ -331,6 +331,7 @@
     color: var(--white);
   }
   .bio strong { color: var(--pink); }
+  .bio strong.white { color: var(--white); }
   .inline-link { color: inherit; text-decoration: underline; }
 
   /* Signup */
@@ -349,21 +350,28 @@
   .email-now .inline-link { color: var(--pink); text-decoration: none; }
   .signup h2 {
     font-family: "Oswald", sans-serif;
-    font-size: clamp(17px, 5vw, 24px);
+    font-size: clamp(19px, 5.5vw, 27px);
     text-transform: uppercase;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: -3px;
     letter-spacing: 0.5px;
     color: var(--white);
   }
   .signup h2 .pink { color: var(--pink); }
   .wink {
-    font-family: "Caveat", cursive;
+    font-family: "Oswald", sans-serif;
     font-size: clamp(15px, 4.5vw, 21px);
-    font-weight: 600;
+    text-transform: uppercase;
+    font-weight: 300;
     color: var(--pink);
     margin-bottom: 20px;
+    white-space: nowrap;
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
+  .wink.fitted { opacity: 1; }
+  .wink .white { color: var(--white); }
   .signup form {
     display: flex;
     flex-direction: column;
@@ -435,16 +443,18 @@
     <div class="headline">I'm <span class="pink">Cruising</span> For Connections</div>
     <div class="subline">Not for sex - <span class="pink">For succession</span></div>
     <div class="bio">
-      <p>I'm trying to buy my first business. <strong>A gay one.</strong> Turns out, that's harder than you'd think.</p>
-      <p>So I'm starting GayInvest.com to help connect queer sellers with queer buyers. Are you one? Do you know some? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong><br><br>Let's keep our business <strong>in the family!</strong></p>
+      <p>I'm on the hunt to buy my first business. <strong>A gay one.</strong> Turns out, this is harder than I thought.</p>
+      <p>So I'm starting GAYINVEST.COM to find queer business owners thinking about what's next &mdash; and connect them with queer buyers like me.</p>
+      <p>Are you one? Do you know one? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong> I always cruise confidentially ;)</p>
+      <p>Let's keep our business <strong class="white">in the family.</strong></p>
     </div>
   </section>
 
   <section class="signup">
     <p class="email-now"><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email Lincoln Now</a></p>
     <p class="or">or</p>
-    <h2>Sign Up For The<br>Gay<span class="pink">Invest</span>.com <span class="pink">NSFW</span>letter!</h2>
-    <p class="wink">(I promise to keep it professional and SFW)</p>
+    <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
+    <p class="wink">Hot leads - <span class="white">Serious business</span></p>
     <form id="signup-form" action="https://formspree.io/f/xkjgwden" method="POST">
       <input type="email" name="email" placeholder="your@email.com" required>
       <button class="btn" type="submit">Sign Me Up</button>
@@ -1108,10 +1118,36 @@
     const currentSpacing = parseFloat(subline.style.letterSpacing) || 0;
     subline.style.letterSpacing = (currentSpacing + 0.11) + 'px';
   }
+  function fitWink() {
+    // Stretch "Hot leads - Serious business" out to exactly match the
+    // newsletter heading's rendered width above it, using only even
+    // letter-spacing (same clean look as the subline) — no font-size
+    // change, no word-spacing.
+    const heading = document.querySelector('.signup h2');
+    const wink = document.querySelector('.wink');
+    // The two lines' boxes already match exactly, but "H" (light weight,
+    // little left bearing) and "G" (bold, rounded, more left bearing)
+    // don't start at the same visual ink position, and likewise "S" vs
+    // "R" on the right — nudge the box itself to compensate.
+    const available = heading.getBoundingClientRect().width + 3;
+    wink.style.marginLeft = '2px';
+    wink.style.letterSpacing = '0px';
+    const naturalWidth = wink.scrollWidth;
+    const numChars = wink.textContent.length;
+    let letterSpacing = numChars > 1 ? (available - naturalWidth) / (numChars - 1) : 0;
+    wink.style.letterSpacing = letterSpacing + 'px';
+    // Measure the actual result and correct any residual error once.
+    const error = available - wink.scrollWidth;
+    if (Math.abs(error) > 0.5 && numChars > 1) {
+      letterSpacing += error / (numChars - 1);
+      wink.style.letterSpacing = letterSpacing + 'px';
+    }
+  }
   function fitAll() {
     fitHero();
     fitHeadline();
     fitSubline();
+    fitWink();
   }
   fitAll();
   window.addEventListener('resize', onlyOnWidthChange(fitAll));
@@ -1133,6 +1169,7 @@
   function revealFittedText() {
     document.querySelector('.headline').classList.add('fitted');
     document.querySelector('.subline').classList.add('fitted');
+    document.querySelector('.wink').classList.add('fitted');
   }
   if (document.fonts && document.fonts.load) {
     Promise.all([
