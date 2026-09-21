@@ -119,6 +119,7 @@
     height: 228px;
     overflow-y: auto;
     background: var(--black);
+    border-bottom: 1px solid var(--pink);
     z-index: 999;
     box-sizing: border-box;
     transform: translateY(-12px);
@@ -229,29 +230,27 @@
   }
   .tagline .pink { color: var(--pink); }
 
-  /* Contact bar */
-  .contact-bar {
-    background: var(--black);
-    color: var(--white);
-    border: 2px solid var(--pink);
-    margin: 0 10px;
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
+  .rule {
+    border: none;
+    border-top: 1px solid var(--pink); /* same weight as the newsletter box's border */
+    width: 100%;
+    margin: 0;
   }
-  .contact-bar p {
-    font-family: "Permanent Marker", cursive;
-    font-weight: 400;
-    text-transform: uppercase;
-    font-size: clamp(15px, 4.8vw, 23px);
-    letter-spacing: 0.5px;
-  }
-  .bar-link {
-    color: var(--pink);
+
+  /* Mailto CTA — a solid pink button sized to its own text, reused
+     for both the "Email Lincoln Now!" button under the subline and
+     the one in the signup box. */
+  .mailto-cta {
+    display: inline-block;
+    background: var(--pink);
+    color: var(--black);
     text-decoration: none;
+    font-family: "Permanent Marker", cursive;
+    font-size: clamp(17px, 5.2vw, 25px);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 18px;
+    border-radius: 0;
   }
   .btn {
     display: inline-flex;
@@ -358,10 +357,17 @@
   }
   .bio strong { color: var(--pink); }
   .inline-link { color: inherit; text-decoration: underline; }
+  .signoff-svg {
+    display: block;
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+    margin-top: 8px;
+  }
 
   /* Signup */
   .signup {
-    background: #141414;
+    background: var(--black);
     padding: 28px 16px 40px; /* matches the bio copy's width above */
     text-align: center;
   }
@@ -371,14 +377,8 @@
     padding: 18px 14px; /* 14px matches the ticket-input's own text padding, so both lines' edges align with "your@email.com" below */
     text-align: center;
   }
-  .email-now {
-    font-family: "Permanent Marker", cursive;
-    font-size: clamp(17px, 5.2vw, 25px);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  .email-now .inline-link { color: var(--pink); text-decoration: none; }
+  .signup .mailto-cta { margin-bottom: 25.5px; }
+  .cruising .mailto-cta { display: table; margin: 0 auto 20px; }
   .signup h2 {
     font-family: "Oswald", sans-serif;
     font-size: clamp(19px, 5.5vw, 27px);
@@ -445,13 +445,6 @@
     margin-left: 0;
     transform: rotate(90deg);
   }
-  .signup .or {
-    color: var(--white);
-    font-size: clamp(11px, 3.2vw, 15px);
-    margin: 4px 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
   .thanks {
     font-family: "Oswald", sans-serif;
     color: var(--pink);
@@ -483,26 +476,28 @@
     <div class="tagline">Keeping Your Business <span class="pink">In The Family</span></div>
   </section>
 
-  <section class="contact-bar">
-    <p><a class="bar-link" href="mailto:lincoln.biz@proton.me">Email Lincoln</a> Tonight!</p>
-  </section>
+  <hr class="rule">
 
   <section class="cruising">
     <div class="photo-frame"><div class="photo-pink-square"><img class="photo-inset" src="images/lincoln-hero.png" alt="Lincoln"><div class="grindr-tag"><span class="ticker-arrow up" aria-hidden="true"></span><span class="grindr-label">LINCOLN, 36</span></div></div></div>
     <div class="headline">I'm <span class="pink">Cruising</span> For Connections</div>
     <div class="subline">Not for sex - <span class="pink">For succession</span></div>
+    <a class="mailto-cta" href="mailto:lincoln.biz@proton.me">Email Lincoln Now!</a>
     <div class="bio">
       <p>I'm on the hunt to buy my first business. <strong>A gay one.</strong> Turns out, it's harder than I thought.</p>
       <p>So I'm starting <strong>GAYINVEST.COM</strong> to find <strong>queer business owners</strong> thinking about what's next &mdash; and connect them with <strong>queer buyers</strong> like me.</p>
       <p>Are you one? Do you know someone? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong></p>
       <p><strong>It's true what they say about me &mdash;</strong> I'll chat up any potential seller, buyer, broker, or adviser with a pulse ;)</p>
       <p>Worried about others finding out? <strong>I always cruise confidentially.</strong></p>
+      <p>Chat soon,</p>
     </div>
+    <img class="signoff-svg" src="images/lincoln-signoff-compact.svg" alt="Lincoln's signature and a kiss">
   </section>
 
+  <hr class="rule">
+
   <section class="signup">
-    <p class="email-now"><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email Lincoln Tonight!</a></p>
-    <p class="or">or</p>
+    <a class="mailto-cta" href="mailto:lincoln.biz@proton.me">Email Lincoln Now!</a>
     <div class="newsletter-box">
       <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
       <p class="wink">Hot leads - <span class="pink">Serious business</span></p>
@@ -598,7 +593,7 @@
       data: `Shout out to the dykes who raised this activated queer!`,
       sources: []
     } },
-    { label: "Queer Financial Security", direction: "down", value: "12 PTS", citation: {
+    { label: "Queer Fin Security", direction: "down", value: "12 PTS", citation: {
       data: `<strong>67% of LGBTQ+ adults</strong> reported doing at least okay financially, compared with <strong>79% of other adults</strong>.`,
       sources: [{ text: "Federal Reserve — Economic Well-Being of U.S. Households in 2021", url: "https://www.federalreserve.gov/publications/2022-economic-well-being-of-us-households-in-2021-overall-financial-well-being-in-2021.htm" }],
       status: "Calculated comparison"
