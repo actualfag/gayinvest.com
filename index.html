@@ -368,7 +368,7 @@
   .newsletter-box {
     border: 1px solid var(--pink);
     border-bottom: none; /* the ticket-input's own top border completes this seam — no doubled-up line */
-    padding: 18px 16px;
+    padding: 18px 14px; /* 14px matches the ticket-input's own text padding, so both lines' edges align with "your@email.com" below */
     text-align: center;
   }
   .email-now {
@@ -384,11 +384,10 @@
     font-size: clamp(19px, 5.5vw, 27px);
     text-transform: uppercase;
     font-weight: 700;
-    margin-bottom: -3px;
+    margin-bottom: -2.95px;
     letter-spacing: 0px; /* must stay non-scaling-free — JS fits this by font-size alone */
     color: var(--white);
     white-space: nowrap;
-    display: inline-block; /* shrink-to-fit, so scrollWidth reflects the text, not the box */
     opacity: 0;
     transition: opacity 0.15s ease;
   }
@@ -399,7 +398,7 @@
     font-size: clamp(15px, 4.5vw, 21px);
     text-transform: uppercase;
     font-weight: 300;
-    color: var(--pink);
+    color: var(--white);
     margin-bottom: 0;
     white-space: nowrap;
     display: inline-block;
@@ -407,7 +406,7 @@
     transition: opacity 0.15s ease;
   }
   .wink.fitted { opacity: 1; }
-  .wink .white { color: var(--white); }
+  .wink .pink { color: var(--pink); }
   .signup form {
     display: block;
   }
@@ -506,7 +505,7 @@
     <p class="or">or</p>
     <div class="newsletter-box">
       <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
-      <p class="wink">Hot leads - <span class="white">Serious business</span></p>
+      <p class="wink">Hot leads - <span class="pink">Serious business</span></p>
     </div>
     <form id="signup-form" action="https://formspree.io/f/xkjgwden" method="POST">
       <div class="ticket-input">
@@ -1173,23 +1172,27 @@
     const currentSpacing = parseFloat(subline.style.letterSpacing) || 0;
     subline.style.letterSpacing = (currentSpacing + 0.11) + 'px';
   }
-  function fitNewsletterHeading() {
-    // The tagline ("Hot leads - Serious business") is now the fixed
-    // reference — it renders at its own natural width, no stretching —
-    // and the heading above it shrinks via font-size to match exactly,
-    // same approach as fitHeadline() matching the hero wordmark.
+  function fitNewsletterCopy() {
+    // Same two-tier pattern as the hero (wordmark + tagline) and the
+    // intro (headline + subline): the heading fits the full available
+    // width by font-size alone (tight, no added tracking), while the
+    // tagline below it renders smaller and gets letter-spaced out to
+    // match that exact same width. Available width = the box's own
+    // width minus 14px each side, matching the ticket-input's text
+    // padding so both lines' edges line up with "your@email.com" below.
+    const box = document.querySelector('.newsletter-box');
     const heading = document.querySelector('.signup h2');
     const wink = document.querySelector('.wink');
-    wink.style.letterSpacing = '0px';
+    const available = box.clientWidth - 28;
     wink.style.marginLeft = '0px';
-    const available = wink.scrollWidth;
     fitLineToPixelWidth(heading, available);
+    fitTaglineToPixelWidth(wink, available, 0.75);
   }
   function fitAll() {
     fitHero();
     fitHeadline();
     fitSubline();
-    fitNewsletterHeading();
+    fitNewsletterCopy();
   }
   fitAll();
   window.addEventListener('resize', onlyOnWidthChange(fitAll));
