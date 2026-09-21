@@ -304,7 +304,10 @@
     text-transform: uppercase;
     margin-bottom: -8.91px; /* matches the wordmark-to-tagline gap */
     white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
+  .headline.fitted { opacity: 1; }
   .headline .pink { color: var(--pink); }
   .subline {
     font-family: "Oswald", sans-serif;
@@ -316,7 +319,10 @@
     margin-bottom: 18px;
     white-space: nowrap;
     display: inline-block;
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
+  .subline.fitted { opacity: 1; }
   .subline .pink { color: var(--pink); }
   .bio p {
     font-size: clamp(15px, 4vw, 19px);
@@ -1111,17 +1117,34 @@
   // measurements actually using the real font metrics (more likely on a
   // slower connection than a fast local one). Explicitly request the
   // exact fonts these calculations depend on and re-fit once they land.
+  //
+  // Rather than trying to guarantee the *first* render is already
+  // correct (which has proven unreliable across devices/connections),
+  // the headline/subline stay invisible (opacity: 0, see CSS) until we
+  // have real confidence the fonts are loaded, then fade in — so no
+  // mismatched intermediate state is ever visible, regardless of what
+  // exactly was slow to load.
+  function revealFittedText() {
+    document.querySelector('.headline').classList.add('fitted');
+    document.querySelector('.subline').classList.add('fitted');
+  }
   if (document.fonts && document.fonts.load) {
     Promise.all([
       document.fonts.load('400 32px "Bebas Neue"'),
       document.fonts.load('300 16px "Oswald"')
-    ]).then(fitAll).catch(function () {});
+    ]).then(function () {
+      fitAll();
+      revealFittedText();
+    }).catch(revealFittedText);
+  } else {
+    revealFittedText();
   }
-  // Belt-and-suspenders: none of the above signals are a hard guarantee
-  // on every device/connection, so re-fit a couple more times shortly
-  // after load to self-correct regardless of what exactly was slow.
-  window.setTimeout(fitAll, 300);
-  window.setTimeout(fitAll, 1000);
+  // Hard fallback: never leave the text permanently invisible even if the
+  // above promise never settles for some reason.
+  window.setTimeout(function () {
+    fitAll();
+    revealFittedText();
+  }, 1500);
 
   const form = document.getElementById('signup-form');
   const thanks = document.getElementById('signup-thanks');
