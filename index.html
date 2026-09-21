@@ -432,8 +432,8 @@
 
   <section class="cruising">
     <div class="photo-frame"><div class="photo-pink-square"><img class="photo-inset" src="images/lincoln-hero.png" alt="Lincoln"></div></div>
-    <div class="headline">I'm <span class="pink">Cruising</span> For Connections.</div>
-    <div class="subline">Not for sex. <span class="pink">For succession.</span></div>
+    <div class="headline">I'm <span class="pink">Cruising</span> For Connections</div>
+    <div class="subline">Not for sex - <span class="pink">For succession</span></div>
     <div class="bio">
       <p>I'm trying to buy my first business. <strong>A gay one.</strong> Turns out, that's harder than you'd think.</p>
       <p>So I'm starting GayInvest.com to help connect queer sellers with queer buyers. Are you one? Do you know some? <strong><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email me!</a></strong><br><br>Let's keep our business <strong>in the family!</strong></p>
@@ -1101,6 +1101,12 @@
     const subline = document.querySelector('.subline');
     const available = cruising.clientWidth - 32; // 16px padding each side
     fitTaglineToPixelWidth(subline, available, 0.75);
+    // Nudge the letter-spacing out just a hair further than the precise
+    // fit — the two lines' computed widths match exactly, but Bebas Neue
+    // and Oswald's last-character glyphs don't carry identical right-side
+    // bearing, so the rendered edges can still look a touch off.
+    const currentSpacing = parseFloat(subline.style.letterSpacing) || 0;
+    subline.style.letterSpacing = (currentSpacing + 0.11) + 'px';
   }
   function fitAll() {
     fitHero();
