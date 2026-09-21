@@ -1148,13 +1148,15 @@
     // Stretch "Hot leads - Serious business" out to exactly match the
     // newsletter heading's rendered width above it, using only even
     // letter-spacing (same clean look as the subline) — no font-size
-    // change, no word-spacing, no manual fudge factor (that proved
-    // unreliable across devices/connections — better to hit the real
-    // target exactly than to "correct" for a guess).
+    // change, no word-spacing. The box widths now match exactly (that
+    // was the real bug — see the font-load fix above); this only
+    // compensates for "H" (light weight, minimal left bearing) landing
+    // left of "G" (bold, rounded, more left bearing) and "S" (light)
+    // overshooting past "R" (bold) on the right.
     const heading = document.querySelector('.signup h2');
     const wink = document.querySelector('.wink');
-    const available = heading.getBoundingClientRect().width;
-    wink.style.marginLeft = '0';
+    const available = heading.getBoundingClientRect().width - 2;
+    wink.style.marginLeft = '1px';
     wink.style.letterSpacing = '0px';
     const naturalWidth = wink.scrollWidth;
     const numChars = wink.textContent.length;
