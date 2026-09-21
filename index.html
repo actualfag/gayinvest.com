@@ -272,7 +272,7 @@
 
   /* Cruising section */
   .cruising {
-    padding: 36px 20px;
+    padding: 36px 16px; /* matches the drawer's content width exactly */
   }
   .photo-frame {
     display: flex;
@@ -304,11 +304,6 @@
     text-transform: uppercase;
     margin-bottom: -8.91px; /* matches the wordmark-to-tagline gap */
     white-space: nowrap;
-    /* .cruising has 20px side padding vs .hero's 10px — break out by the
-       10px difference on each side so this lines up edge-to-edge with the
-       wordmark above instead of overflowing this section's own padding. */
-    margin-left: -10px;
-    margin-right: -10px;
   }
   .headline .pink { color: var(--pink); }
   .subline {
@@ -321,8 +316,6 @@
     margin-bottom: 18px;
     white-space: nowrap;
     display: inline-block;
-    margin-left: -10px;
-    margin-right: -10px;
   }
   .subline .pink { color: var(--pink); }
   .bio p {
@@ -1086,19 +1079,22 @@
     fitTaglineWithSpacing(hero, document.querySelector('.tagline'), 0.75);
   }
   function fitHeadline() {
-    // Match the wordmark's exact rendered width, not just "fits within
-    // its own section" — the hero and cruising sections have different
-    // side padding, so sizing independently wouldn't align the edges.
-    const wordmark = document.querySelector('.wordmark');
+    // Headline and subline both target the cruising section's own content
+    // width directly (same source, computed once) so they're guaranteed
+    // to match each other exactly, rather than one deriving from the
+    // other's rendered (and possibly sub-pixel-rounded) width. This also
+    // equals the drawer's content width, since .cruising's padding (16px)
+    // matches .ticker-drawer-inner's exactly.
+    const cruising = document.querySelector('.cruising');
     const headline = document.querySelector('.headline');
-    fitLineToPixelWidth(headline, wordmark.getBoundingClientRect().width);
+    const available = cruising.clientWidth - 32; // 16px padding each side
+    fitLineToPixelWidth(headline, available);
   }
   function fitSubline() {
-    // Same relationship as tagline-to-wordmark, but targeting the
-    // headline's exact width instead of the section's own padding.
-    const headline = document.querySelector('.headline');
+    const cruising = document.querySelector('.cruising');
     const subline = document.querySelector('.subline');
-    fitTaglineToPixelWidth(subline, headline.getBoundingClientRect().width, 0.75);
+    const available = cruising.clientWidth - 32; // 16px padding each side
+    fitTaglineToPixelWidth(subline, available, 0.75);
   }
   function fitAll() {
     fitHero();
@@ -1121,6 +1117,11 @@
       document.fonts.load('300 16px "Oswald"')
     ]).then(fitAll).catch(function () {});
   }
+  // Belt-and-suspenders: none of the above signals are a hard guarantee
+  // on every device/connection, so re-fit a couple more times shortly
+  // after load to self-correct regardless of what exactly was slow.
+  window.setTimeout(fitAll, 300);
+  window.setTimeout(fitAll, 1000);
 
   const form = document.getElementById('signup-form');
   const thanks = document.getElementById('signup-thanks');
