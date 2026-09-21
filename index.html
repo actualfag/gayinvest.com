@@ -280,6 +280,7 @@
     margin-bottom: 28px;
   }
   .photo-pink-square {
+    position: relative;
     width: 57%;
     max-width: 238px;
     aspect-ratio: 3 / 4;
@@ -288,6 +289,31 @@
     align-items: flex-end;
     justify-content: center;
     box-sizing: border-box;
+  }
+  .grindr-tag {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+  }
+  .grindr-tag .ticker-arrow {
+    margin-left: 0;
+    font-size: 11px; /* the arrow's em-based border sizes key off this */
+  }
+  .grindr-tag .ticker-arrow.up {
+    border-bottom-color: var(--pink);
+    filter: drop-shadow(0 0 3px rgba(200, 53, 95, 0.9));
+  }
+  .grindr-label {
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--white);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
   }
   .photo-inset {
     width: 100%;
@@ -435,11 +461,11 @@
   </section>
 
   <section class="contact-bar">
-    <p><a class="bar-link" href="mailto:lincoln.biz@proton.me">Email Lincoln</a> Today!</p>
+    <p><a class="bar-link" href="mailto:lincoln.biz@proton.me">Email Lincoln</a> Tonight!</p>
   </section>
 
   <section class="cruising">
-    <div class="photo-frame"><div class="photo-pink-square"><img class="photo-inset" src="images/lincoln-hero.png" alt="Lincoln"></div></div>
+    <div class="photo-frame"><div class="photo-pink-square"><img class="photo-inset" src="images/lincoln-hero.png" alt="Lincoln"><div class="grindr-tag"><span class="ticker-arrow up" aria-hidden="true"></span><span class="grindr-label">LINCOLN, 36</span></div></div></div>
     <div class="headline">I'm <span class="pink">Cruising</span> For Connections</div>
     <div class="subline">Not for sex - <span class="pink">For succession</span></div>
     <div class="bio">
@@ -451,7 +477,7 @@
   </section>
 
   <section class="signup">
-    <p class="email-now"><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email Lincoln Now</a></p>
+    <p class="email-now"><a class="inline-link" href="mailto:lincoln.biz@proton.me">Email Lincoln Tonight!</a></p>
     <p class="or">or</p>
     <h2>Get the <span class="pink">gayinvest.com</span> newsletter</h2>
     <p class="wink">Hot leads - <span class="white">Serious business</span></p>
@@ -526,7 +552,7 @@
       sources: []
     } },
     { label: "Plan to Close", direction: "down", value: "22%", citation: {
-      data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business. The down arrow signals closure as undesirable.`,
+      data: `<strong>22% of surveyed business owners</strong> said their long-term plan was to close the business.`,
       sources: [{ text: "Gallup", url: "https://news.gallup.com/poll/657362/small-business-owners-lack-succession-plan.aspx" }],
       status: "Survey result with editorial arrow"
     } },
@@ -550,7 +576,7 @@
       status: "Calculated comparison"
     } },
     { label: "Queer Poverty Gap", direction: "up", value: "5 PTS", citation: {
-      data: `In 2021, <strong>17% of LGBT adults</strong> lived in poverty, compared with <strong>12% of non-LGBT adults</strong>&mdash;a <strong>5-percentage-point disparity</strong> for queers.`,
+      data: `In 2021, <strong>17% of LGBT adults</strong> lived in poverty, compared with <strong>12% of non-LGBT adults</strong>.`,
       sources: [{ text: "Williams Institute — LGBT Poverty in the United States", url: "https://williamsinstitute.law.ucla.edu/publications/lgbt-poverty-us/" }],
       status: "Calculated comparison"
     } },
