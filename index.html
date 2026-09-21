@@ -297,19 +297,32 @@
     display: block;
   }
   .headline {
-    font-family: "Oswald", sans-serif;
+    font-family: "Bebas Neue", "Arial Narrow", sans-serif;
     font-size: clamp(26px, 8vw, 38px);
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.05;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: -8.91px; /* matches the wordmark-to-tagline gap */
+    white-space: nowrap;
+    /* .cruising has 20px side padding vs .hero's 10px — break out by the
+       10px difference on each side so this lines up edge-to-edge with the
+       wordmark above instead of overflowing this section's own padding. */
+    margin-left: -10px;
+    margin-right: -10px;
   }
   .headline .pink { color: var(--pink); }
   .subline {
     font-family: "Oswald", sans-serif;
+    color: var(--white);
     font-size: clamp(15px, 4.5vw, 22px);
-    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 300;
     margin-bottom: 18px;
+    white-space: nowrap;
+    display: inline-block;
+    margin-left: -10px;
+    margin-right: -10px;
   }
   .subline .pink { color: var(--pink); }
   .bio p {
@@ -1025,9 +1038,8 @@
   initTickerDrawer();
 
 
-  function fitLineToWidth(container, el, extraScaleY) {
+  function fitLineToPixelWidth(el, available, extraScaleY) {
     el.style.transform = 'none';
-    const available = container.clientWidth - 20; // 10px buffer each side
     el.style.fontSize = '100px';
     let size = 100;
     // iterate to converge despite fixed (non-scaling) letter-spacing
@@ -1040,28 +1052,74 @@
       el.style.transform = `scaleY(${extraScaleY})`;
     }
   }
-  function fitTaglineWithSpacing(container, el, sizeFactor) {
+  function fitLineToWidth(container, el, extraScaleY) {
+    fitLineToPixelWidth(el, container.clientWidth - 20, extraScaleY); // 10px buffer each side
+  }
+  function fitTaglineToPixelWidth(el, available, sizeFactor) {
     el.style.letterSpacing = '0px';
     el.style.fontSize = '100px';
     const naturalWidthAt100 = el.scrollWidth;
-    const available = container.clientWidth - 20; // 10px buffer each side
     const fullFitSize = (available / naturalWidthAt100) * 100;
     const newSize = fullFitSize * sizeFactor;
     el.style.fontSize = newSize + 'px';
     const widthAtNewSize = el.scrollWidth;
     const numChars = el.textContent.length;
-    const spacing = (available - widthAtNewSize) / numChars;
+    let spacing = (available - widthAtNewSize) / numChars;
     el.style.letterSpacing = spacing + 'px';
+    // Browsers disagree on whether letter-spacing is applied after the
+    // final character, which can leave this short of the target width on
+    // some engines. Measure the actual result and correct for it once,
+    // rather than assuming one browser's convention.
+    const actualWidth = el.scrollWidth;
+    const error = available - actualWidth;
+    if (Math.abs(error) > 0.5 && numChars > 1) {
+      spacing += error / (numChars - 1);
+      el.style.letterSpacing = spacing + 'px';
+    }
+  }
+  function fitTaglineWithSpacing(container, el, sizeFactor) {
+    fitTaglineToPixelWidth(el, container.clientWidth - 20, sizeFactor); // 10px buffer each side
   }
   function fitHero() {
     const hero = document.querySelector('.hero');
     fitLineToWidth(hero, document.querySelector('.wordmark'), 1.246);
     fitTaglineWithSpacing(hero, document.querySelector('.tagline'), 0.75);
   }
-  fitHero();
-  window.addEventListener('resize', onlyOnWidthChange(fitHero));
+  function fitHeadline() {
+    // Match the wordmark's exact rendered width, not just "fits within
+    // its own section" — the hero and cruising sections have different
+    // side padding, so sizing independently wouldn't align the edges.
+    const wordmark = document.querySelector('.wordmark');
+    const headline = document.querySelector('.headline');
+    fitLineToPixelWidth(headline, wordmark.getBoundingClientRect().width);
+  }
+  function fitSubline() {
+    // Same relationship as tagline-to-wordmark, but targeting the
+    // headline's exact width instead of the section's own padding.
+    const headline = document.querySelector('.headline');
+    const subline = document.querySelector('.subline');
+    fitTaglineToPixelWidth(subline, headline.getBoundingClientRect().width, 0.75);
+  }
+  function fitAll() {
+    fitHero();
+    fitHeadline();
+    fitSubline();
+  }
+  fitAll();
+  window.addEventListener('resize', onlyOnWidthChange(fitAll));
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(fitHero);
+    document.fonts.ready.then(fitAll);
+  }
+  // document.fonts.ready only resolves for fonts the browser has already
+  // noticed are needed, which can race ahead of these width-matching
+  // measurements actually using the real font metrics (more likely on a
+  // slower connection than a fast local one). Explicitly request the
+  // exact fonts these calculations depend on and re-fit once they land.
+  if (document.fonts && document.fonts.load) {
+    Promise.all([
+      document.fonts.load('400 32px "Bebas Neue"'),
+      document.fonts.load('300 16px "Oswald"')
+    ]).then(fitAll).catch(function () {});
   }
 
   const form = document.getElementById('signup-form');
