@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GayInvest.com</title>
+<meta name="description" content="Keeping Your Business In The Family. GAYINVEST.COM connects queer business owners thinking about what's next with queer buyers.">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.gayinvest.com/">
+<meta property="og:title" content="GAYINVEST.COM">
+<meta property="og:description" content="Keeping Your Business In The Family.">
+<meta property="og:image" content="https://www.gayinvest.com/images/og-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GAYINVEST.COM">
+<meta name="twitter:description" content="Keeping Your Business In The Family.">
+<meta name="twitter:image" content="https://www.gayinvest.com/images/og-preview.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;700&family=Courier+Prime:wght@400;700&family=Inter:wght@500;700&family=Caveat:wght@600&family=Permanent+Marker&family=IBM+Plex+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -453,6 +468,26 @@
     text-transform: uppercase;
     padding: 12px 0;
   }
+
+  /* Footer */
+  .site-footer {
+    background: var(--black);
+    color: var(--pink);
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 20px 16px 32px;
+  }
+  .site-footer a {
+    color: var(--pink);
+    text-decoration: none;
+  }
+  .site-footer a.footer-underline {
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
@@ -510,6 +545,10 @@
     </form>
     <div id="signup-thanks" class="thanks" hidden>Thanks for cruising!</div>
   </section>
+
+  <footer class="site-footer">
+    &copy; 2026 GAYINVEST.COM, <a class="footer-underline" href="https://www.linkedin.com/in/lincolnneiger/" target="_blank" rel="noopener">Lincoln on LinkedIn</a> &middot; <a href="mailto:lincoln.biz@proton.me">Contact</a>
+  </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
